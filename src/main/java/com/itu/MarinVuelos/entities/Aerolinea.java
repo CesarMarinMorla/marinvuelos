@@ -1,5 +1,6 @@
 package com.itu.MarinVuelos.entities;
 
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -9,13 +10,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "ciudad")
+@Table(name = "aerolinea")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class  Ciudad extends Base {
+public class Aerolinea extends Base{
 
-    @Column(name = "nombreCiudad")
-    private String nombreCiudad;
+    @Column(name = "nombre_aerolinea")
+    private String nombreAerolinea;
 }

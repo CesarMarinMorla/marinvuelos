@@ -1,11 +1,8 @@
-package com.itu.MarinVuelos.entities;
+package com.itu.MarinVuelos.entities.pagos;
 
 import com.itu.MarinVuelos.entities.enums.TipoTarjeta;
 import com.itu.MarinVuelos.entities.actores.Usuario;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +15,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Tarjeta extends Pago {
-    private String numero;
+
+    @Column(name = "numero_tarjeta")
+    private String numeroTarjeta;
+
+    @Column(name = "tipo_tarjeta")
+    @Enumerated(EnumType.STRING)
     private TipoTarjeta tipoTarjeta;
 
     @ManyToOne

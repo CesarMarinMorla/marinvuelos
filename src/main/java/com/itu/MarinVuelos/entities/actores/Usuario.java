@@ -1,7 +1,7 @@
 package com.itu.MarinVuelos.entities.actores;
 
 
-import com.itu.MarinVuelos.entities.Tarjeta;
+import com.itu.MarinVuelos.entities.pagos.Tarjeta;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
