@@ -1,12 +1,21 @@
 package com.itu.MarinVuelos.entities;
 
 import com.itu.MarinVuelos.entities.enums.Clase;
-import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.math.BigDecimal;
 
+@Entity
+@Table(name = "tarifa")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Tarifa extends Base {
 
     @NotNull

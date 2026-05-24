@@ -15,7 +15,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Aerolinea extends Base{
+public class Aerolinea extends Base {
+
 
     @Column(name = "nombre_aerolinea")
     private String nombreAerolinea;

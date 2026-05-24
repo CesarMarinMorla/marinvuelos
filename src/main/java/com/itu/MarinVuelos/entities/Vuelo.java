@@ -2,6 +2,7 @@ package com.itu.MarinVuelos.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,13 +10,18 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "ciudad")
+@Table(name = "vuelo")
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class Ciudad extends Base {
+@NoArgsConstructor
+public class Vuelo extends Base {
 
-    @Column(name = "nombreCiudad")
-    private String nombreCiudad;
+    /*
+    No Cascade para Avion, quiero que tengan ciclo de vida independiente
+     */
+    @OneToOne(mappedBy = "vuelo")
+    private Avion avion;
+
+
 }

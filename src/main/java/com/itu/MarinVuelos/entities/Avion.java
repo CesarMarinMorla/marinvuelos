@@ -15,7 +15,7 @@ import java.util.ArrayList;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Avion  {
+public class Avion extends Base {
 
     /*
     Modelo y marca deberían mostrarse a la hora de hacer una reserva
@@ -49,4 +49,8 @@ public class Avion  {
 
     @OneToMany(mappedBy = "avion",  cascade = CascadeType.ALL, orphanRemoval = true) // composicion en asientos
     private ArrayList<Asiento> asientos;
+
+    @OneToOne
+    @JoinColumn(name = "vuelo_id")
+    private Vuelo vuelo;
 }

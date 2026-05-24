@@ -9,6 +9,11 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 
+/*
+Decision personal, uso de clase abstracta en vez de clase concreta,
+Reserva referencia directamente a Tarjeta, clase hija
+ */
+
 @MappedSuperclass
 @Getter
 @Setter

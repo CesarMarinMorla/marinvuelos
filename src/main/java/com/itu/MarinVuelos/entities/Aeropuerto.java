@@ -12,11 +12,14 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Aeropuerto extends Base{
+public class Aeropuerto extends Base {
 
     @Column(name = "nombre_aeropuerto")
     private String nombreAeropuerto;
 
+    /*
+    Referencia al ID de ciudad, evita la repeticion de la misma ciudad en la BD
+     */
     @OneToOne
     @JoinColumn(name = "ciudad_id")
     private Ciudad ciudad;
