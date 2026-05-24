@@ -21,7 +21,17 @@ public class Asiento extends Base {
     @Column(name = "letra")
     private char letra;
 
+    /*
+    Necesario para poder encontrar asientos libres y ocupados
+     */
+    @Column(name = "ocupado")
+    private boolean ocupado;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "clase")
     private Clase clase;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "avion_id", nullable = false)
+    private Avion avion;
 }

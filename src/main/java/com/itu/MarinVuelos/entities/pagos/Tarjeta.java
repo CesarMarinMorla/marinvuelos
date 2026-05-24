@@ -20,10 +20,10 @@ public class Tarjeta extends Pago {
     private String numeroTarjeta;
 
     @Column(name = "tipo_tarjeta")
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING) // persiste string en vez de indice
     private TipoTarjeta tipoTarjeta;
 
-    @ManyToOne
-    @JoinColumn(name = "usuario_id", nullable = false) // columna de referencia al usuario
+    @ManyToOne(fetch = FetchType.LAZY) // LAZY para no cargar al usuario con cada Tarjeta
+    @JoinColumn(name = "usuario_id", nullable = false) // JoinColumn columna de referencia al usuario
     private Usuario usuario;
 }

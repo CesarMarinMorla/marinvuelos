@@ -25,6 +25,11 @@ public class Usuario extends Persona {
     @Column(name = "correo")
     private String correo;
 
+    /*
+    Para tarjetas usaré composicion, decision personal,
+    el diagrama tiene agregacion originalmente
+    si el usuario es eliminado las tarjetas se deben ir con él
+     */
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Tarjeta> tarjetas =  new ArrayList<>(); // composicion, decision personal
+    private List<Tarjeta> tarjetas =  new ArrayList<>();
 }
