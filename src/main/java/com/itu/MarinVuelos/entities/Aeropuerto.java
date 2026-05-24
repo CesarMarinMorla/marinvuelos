@@ -23,4 +23,8 @@ public class Aeropuerto extends Base {
     @OneToOne
     @JoinColumn(name = "ciudad_id")
     private Ciudad ciudad;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vuelo_id", nullable = false)
+    private Vuelo vuelo;
 }

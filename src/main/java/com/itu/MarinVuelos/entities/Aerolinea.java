@@ -1,13 +1,11 @@
 package com.itu.MarinVuelos.entities;
 
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "aerolinea")
@@ -17,7 +15,10 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Aerolinea extends Base {
 
-
     @Column(name = "nombre_aerolinea")
     private String nombreAerolinea;
+
+    // Para sacar lista completa de vuelos
+    @OneToMany(mappedBy = "aerolinea")
+    private ArrayList<Vuelo> vuelo;
 }

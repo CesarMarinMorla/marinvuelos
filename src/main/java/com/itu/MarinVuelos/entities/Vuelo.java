@@ -1,13 +1,12 @@
 package com.itu.MarinVuelos.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "vuelo")
@@ -23,5 +22,14 @@ public class Vuelo extends Base {
     @OneToOne(mappedBy = "vuelo")
     private Avion avion;
 
+    @OneToMany(mappedBy = "vuelo")
+    private ArrayList<Aeropuerto> aeropuertos;
 
+    /*
+    Para no duplicar Aerolinea constantemente en la BD
+    usaré ManyToOne
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "aerolinea_id", nullable = false)
+    private Aerolinea aerolinea;
 }
