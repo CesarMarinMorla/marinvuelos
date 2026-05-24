@@ -1,9 +1,8 @@
 package com.itu.MarinVuelos.entities;
 
+import com.itu.MarinVuelos.entities.actores.Usuario;
 import com.itu.MarinVuelos.entities.logistica.Vuelo;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,4 +18,8 @@ public class Consulta extends Base {
 
     @OneToOne(mappedBy = "consulta")
     private Vuelo vuelo;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
 }

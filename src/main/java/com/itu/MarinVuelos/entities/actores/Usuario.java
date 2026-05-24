@@ -1,6 +1,7 @@
 package com.itu.MarinVuelos.entities.actores;
 
 
+import com.itu.MarinVuelos.entities.Consulta;
 import com.itu.MarinVuelos.entities.pagos.Tarjeta;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -33,5 +34,6 @@ public class Usuario extends Persona {
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tarjeta> tarjetas =  new ArrayList<>();
 
-
+    @OneToMany(mappedBy = "usuario")
+    private ArrayList<Consulta> consultas;
 }
