@@ -1,7 +1,8 @@
 package com.itu.MarinVuelos.entities.actores;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import com.itu.MarinVuelos.entities.logistica.Vuelo;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,7 +12,14 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-// @AllArgs genera conflictos en el build
+@AllArgsConstructor
 public class Piloto extends Persona {
+
+    @Column(name = "licencia")
+    private String licencia;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vuelo_id")
+    private Vuelo vuelo;
 
 }

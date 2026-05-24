@@ -1,5 +1,6 @@
-package com.itu.MarinVuelos.entities;
+package com.itu.MarinVuelos.entities.logistica;
 
+import com.itu.MarinVuelos.entities.Base;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

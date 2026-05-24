@@ -1,11 +1,14 @@
-package com.itu.MarinVuelos.entities;
+package com.itu.MarinVuelos.entities.logistica;
 
+import com.itu.MarinVuelos.entities.Base;
+import com.itu.MarinVuelos.entities.Reserva;
+import com.itu.MarinVuelos.entities.actores.Piloto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 @Entity
@@ -35,4 +38,18 @@ public class Vuelo extends Base {
 
     @OneToMany(mappedBy = "vuelo")
     private ArrayList<Tarifa> tarifas;
+
+    @Column(name = "fecha_salida")
+    private LocalDateTime fechaSalida;
+
+    @Column(name = "fecha_llegada")
+    private LocalDateTime fechaLlegada;
+
+    // un vuelo real podria tener varios pilotos pero usare OneToOne para este proyecto
+    @OneToOne(mappedBy = "vuelo")
+    private Piloto piloto;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reserva_id")
+    private Reserva reserva;
 }

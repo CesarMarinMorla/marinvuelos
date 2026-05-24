@@ -1,7 +1,8 @@
 package com.itu.MarinVuelos.entities;
 
-import jakarta.persistence.Column;
+import com.itu.MarinVuelos.entities.logistica.Vuelo;
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,13 +10,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "ciudad")
+@Table(name = "reserva")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Ciudad extends Base {
+public class Reserva extends Base{
 
-    @Column(name = "nombreCiudad")
-    private String nombreCiudad;
+    @OneToOne(mappedBy = "reserva")
+    private Vuelo vuelo;
 }

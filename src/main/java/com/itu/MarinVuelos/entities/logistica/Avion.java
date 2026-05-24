@@ -1,5 +1,6 @@
-package com.itu.MarinVuelos.entities;
+package com.itu.MarinVuelos.entities.logistica;
 
+import com.itu.MarinVuelos.entities.Base;
 import com.itu.MarinVuelos.entities.enums.TipoAvion;
 import com.itu.MarinVuelos.entities.enums.TipoTurbina;
 import jakarta.persistence.*;
