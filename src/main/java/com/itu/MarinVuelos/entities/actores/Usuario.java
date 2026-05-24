@@ -19,8 +19,8 @@ import java.util.List;
 @AllArgsConstructor
 public class Usuario extends Persona {
 
-    @Column(name = "contra")
-    private String contra;
+    @Column(name = "password")
+    private String password;
 
     @Column(name = "correo")
     private String correo;
@@ -32,4 +32,6 @@ public class Usuario extends Persona {
      */
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tarjeta> tarjetas =  new ArrayList<>();
+
+
 }

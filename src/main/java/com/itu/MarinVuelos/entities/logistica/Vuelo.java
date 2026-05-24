@@ -1,6 +1,7 @@
 package com.itu.MarinVuelos.entities.logistica;
 
 import com.itu.MarinVuelos.entities.Base;
+import com.itu.MarinVuelos.entities.Consulta;
 import com.itu.MarinVuelos.entities.Reserva;
 import com.itu.MarinVuelos.entities.actores.Piloto;
 import jakarta.persistence.*;
@@ -52,4 +53,8 @@ public class Vuelo extends Base {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reserva_id")
     private Reserva reserva;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "consulta_id")
+    private Consulta consulta;
 }
