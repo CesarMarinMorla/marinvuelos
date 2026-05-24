@@ -32,4 +32,7 @@ public class Vuelo extends Base {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "aerolinea_id", nullable = false)
     private Aerolinea aerolinea;
+
+    @OneToMany(mappedBy = "vuelo")
+    private ArrayList<Tarifa> tarifas;
 }

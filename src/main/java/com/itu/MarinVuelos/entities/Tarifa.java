@@ -18,15 +18,21 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class Tarifa extends Base {
 
-    @NotNull
-    @Column(name = "impuesto_tarifa", precision = 10, scale = 2, nullable = false)
-    private BigDecimal impuestoTarifa;
+    @Column(name = "clase_tarifa")
+    @Enumerated(EnumType.STRING)
+    private Clase claseTarifa;
+
+    // precio + impuesto se calcula en runtime
 
     @NotNull
     @Column(name = "precio_tarifa", precision = 10, scale = 2, nullable = false)
     private BigDecimal precioTarifa;
 
-    @Column(name = "clase_tarifa")
-    @Enumerated(EnumType.STRING)
-    private Clase claseTarifa;
+    @NotNull
+    @Column(name = "impuesto_tarifa", precision = 10, scale = 2, nullable = false)
+    private BigDecimal impuestoTarifa;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vuelo_id", nullable = false)
+    private Vuelo vuelo;
 }
