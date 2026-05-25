@@ -46,7 +46,9 @@ public class Vuelo extends Base {
     @Column(name = "fecha_llegada")
     private LocalDateTime fechaLlegada;
 
-    // un vuelo real podria tener varios pilotos pero usare OneToOne para este proyecto
+    /*
+    un vuelo real podria tener varios pilotos pero usare OneToOne para este proyecto
+     */
     @OneToOne(mappedBy = "vuelo")
     private Piloto piloto;
 

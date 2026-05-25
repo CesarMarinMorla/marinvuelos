@@ -48,7 +48,10 @@ public class Avion extends Base {
     @Enumerated(EnumType.STRING)
     private TipoTurbina tipoTurbina;
 
-    @OneToMany(mappedBy = "avion",  cascade = CascadeType.ALL, orphanRemoval = true) // composicion en asientos
+    /*
+    composicion en asientos
+    */
+    @OneToMany(mappedBy = "avion",  cascade = CascadeType.ALL, orphanRemoval = true)
     private ArrayList<Asiento> asientos;
 
     @OneToOne

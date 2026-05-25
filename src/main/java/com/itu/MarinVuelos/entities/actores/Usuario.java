@@ -2,6 +2,7 @@ package com.itu.MarinVuelos.entities.actores;
 
 
 import com.itu.MarinVuelos.entities.Consulta;
+import com.itu.MarinVuelos.entities.Reserva;
 import com.itu.MarinVuelos.entities.pagos.Tarjeta;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -36,4 +37,7 @@ public class Usuario extends Persona {
 
     @OneToMany(mappedBy = "usuario")
     private ArrayList<Consulta> consultas;
+
+    @OneToOne(mappedBy = "usuario")
+    private Reserva reserva;
 }

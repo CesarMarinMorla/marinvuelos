@@ -23,8 +23,10 @@ public class Tarifa extends Base {
     @Enumerated(EnumType.STRING)
     private Clase claseTarifa;
 
-    // precio + impuesto se calcula en runtime
 
+    /*
+    precio + impuesto se calcula en runtime
+    */
     @NotNull
     @Column(name = "precio_tarifa", precision = 10, scale = 2, nullable = false)
     private BigDecimal precioTarifa;
