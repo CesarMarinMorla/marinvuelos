@@ -35,9 +35,4 @@ public class Usuario extends Persona {
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tarjeta> tarjetas =  new ArrayList<>();
 
-    @OneToMany(mappedBy = "usuario")
-    private ArrayList<Consulta> consultas;
-
-    @OneToOne(mappedBy = "usuario")
-    private Reserva reserva;
 }

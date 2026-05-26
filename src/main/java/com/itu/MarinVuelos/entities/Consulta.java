@@ -16,9 +16,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Consulta extends Base {
 
-    @OneToOne(mappedBy = "consulta")
-    private Vuelo vuelo;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;

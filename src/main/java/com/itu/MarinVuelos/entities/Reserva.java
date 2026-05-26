@@ -17,9 +17,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Reserva extends Base{
 
-    @OneToOne(mappedBy = "reserva")
-    private Vuelo vuelo;
-
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
