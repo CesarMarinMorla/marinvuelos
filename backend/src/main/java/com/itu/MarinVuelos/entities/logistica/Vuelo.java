@@ -40,7 +40,7 @@ public class Vuelo extends Base {
 
     @JsonIgnore
     @OneToMany(mappedBy = "vuelo")
-    private ArrayList<Tarifa> tarifas;
+    private List<Tarifa> tarifas = new ArrayList<>();
 
     @NotNull(message = "Fecha de salida requerida")
     @Column(name = "fecha_salida")
