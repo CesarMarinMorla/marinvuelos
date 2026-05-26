@@ -26,11 +26,4 @@ public class Aeropuerto extends Base {
     @OneToOne
     @JoinColumn(name = "ciudad_id")
     private Ciudad ciudad;
-
-    /*
-    Aeropuerto es datos maestros, puede servir en muchos vuelos
-    Relación ManyToMany: un aeropuerto en muchos vuelos, un vuelo usa múltiples aeropuertos
-     */
-    @ManyToMany(mappedBy = "aeropuertos")
-    private List<Vuelo> vuelos = new ArrayList<>();
 }

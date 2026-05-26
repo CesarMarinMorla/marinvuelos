@@ -1,5 +1,6 @@
 package com.itu.MarinVuelos.entities.logistica;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.itu.MarinVuelos.entities.Base;
 import com.itu.MarinVuelos.entities.Consulta;
 import com.itu.MarinVuelos.entities.Reserva;
@@ -21,16 +22,6 @@ import java.util.List;
 @NoArgsConstructor
 public class Vuelo extends Base {
 
-    /*
-    No Cascade para Avion, quiero que tengan ciclo de vida independiente
-     */
-    @OneToOne(mappedBy = "vuelo")
-    private Avion avion;
-
-    /*
-    ManyToMany: un vuelo puede pasar por múltiples aeropuertos,
-    un aeropuerto es usado por múltiples vuelos
-     */
     @ManyToMany
     @JoinTable(
         name = "vuelo_aeropuerto",
@@ -39,14 +30,11 @@ public class Vuelo extends Base {
     )
     private List<Aeropuerto> aeropuertos = new ArrayList<>();
 
-    /*
-    Para no duplicar Aerolinea constantemente en la BD
-    usaré ManyToOne
-     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "aerolinea_id", nullable = false)
     private Aerolinea aerolinea;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "vuelo")
     private ArrayList<Tarifa> tarifas;
 
@@ -56,10 +44,14 @@ public class Vuelo extends Base {
     @Column(name = "fecha_llegada")
     private LocalDateTime fechaLlegada;
 
-    /*
-    un vuelo real podria tener varios pilotos pero usare OneToOne para este proyecto
-     */
-    @OneToOne(mappedBy = "vuelo")
+    @JsonIgnore
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "avion_id")
+    private Avion avion;
+
+    @JsonIgnore
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "piloto_id")
     private Piloto piloto;
 
     @OneToOne(fetch = FetchType.LAZY)
