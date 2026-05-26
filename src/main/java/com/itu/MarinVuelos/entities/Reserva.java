@@ -21,6 +21,10 @@ public class Reserva extends Base{
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vuelo_id", unique = true)
+    private Vuelo vuelo;
+
     @OneToOne(mappedBy = "reserva")
     private Pago pago;
 }
