@@ -2,6 +2,7 @@ package com.itu.MarinVuelos.controllers;
 
 import com.itu.MarinVuelos.entities.Base;
 import com.itu.MarinVuelos.services.BaseServiceImpl;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +48,7 @@ public abstract class BaseControllerImpl<E extends Base, S extends BaseServiceIm
     }
 
     @PostMapping("")
-    public ResponseEntity<?> save(@RequestBody E entity) {
+    public ResponseEntity<?> save(@Valid @RequestBody E entity) {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(servicio.save(entity));
         } catch (Exception e) {
@@ -56,7 +57,7 @@ public abstract class BaseControllerImpl<E extends Base, S extends BaseServiceIm
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody E entity) {
+    public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody E entity) {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(servicio.update(id, entity));
         } catch (Exception e) {
