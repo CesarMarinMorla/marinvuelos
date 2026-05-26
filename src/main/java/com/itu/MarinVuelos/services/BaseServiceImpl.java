@@ -5,6 +5,8 @@ import com.itu.MarinVuelos.repositories.BaseRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 
@@ -23,6 +25,17 @@ public abstract class BaseServiceImpl<E extends Base, ID extends Serializable> i
     @Transactional
     public List<E> findAll() throws Exception {
         return baseRepository.findAll();
+    }
+
+    @Override
+    @Transactional
+    public Page<E> findAll(Pageable pageable) throws Exception {
+        try {
+            return baseRepository.findAll(pageable);
+        } catch (Exception e) {
+            log.error("Error fetching paginated entities", e);
+            throw e;
+        }
     }
 
     @Override
