@@ -32,8 +32,4 @@ public class Avion extends Base {
     @Column(name = "tipo_turbina")
     @Enumerated(EnumType.STRING)
     private TipoTurbina tipoTurbina;
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "avion",  cascade = CascadeType.ALL, orphanRemoval = true)
-    private ArrayList<Asiento> asientos;
 }

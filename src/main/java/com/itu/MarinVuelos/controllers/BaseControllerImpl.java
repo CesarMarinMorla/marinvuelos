@@ -2,6 +2,8 @@ package com.itu.MarinVuelos.controllers;
 
 import com.itu.MarinVuelos.entities.Base;
 import com.itu.MarinVuelos.services.BaseServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -11,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import java.io.Serializable;
 
 public abstract class BaseControllerImpl<E extends Base, S extends BaseServiceImpl<E, Long>> implements BaseController<E, Long> {
+    private static final Logger log = LoggerFactory.getLogger(BaseControllerImpl.class);
+    
     @Autowired
     protected S servicio;
 
@@ -19,6 +23,7 @@ public abstract class BaseControllerImpl<E extends Base, S extends BaseServiceIm
         try {
             return ResponseEntity.status(HttpStatus.OK).body(servicio.findAll());
         } catch (Exception e) {
+            log.error("Error en getAll: ", e);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\":\"Error, por favor intente más tarde.\"}");
         }
     }
