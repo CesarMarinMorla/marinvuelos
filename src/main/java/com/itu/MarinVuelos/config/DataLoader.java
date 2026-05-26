@@ -94,21 +94,21 @@ public class DataLoader implements CommandLineRunner {
         Avion boeing737 = new Avion();
         boeing737.setMarca("Boeing");
         boeing737.setModelo("737");
-        boeing737.setTipoAvion(TipoAvion.COMERCIAL);
+        boeing737.setTipoAvion(TipoAvion.NARROW_BODY);
         boeing737.setTipoTurbina(TipoTurbina.TURBOFAN);
         avionRepository.save(boeing737);
 
         Avion airbus = new Avion();
         airbus.setMarca("Airbus");
         airbus.setModelo("A320");
-        airbus.setTipoAvion(TipoAvion.COMERCIAL);
+        airbus.setTipoAvion(TipoAvion.NARROW_BODY);
         airbus.setTipoTurbina(TipoTurbina.TURBOFAN);
         avionRepository.save(airbus);
 
         Avion bombardier = new Avion();
         bombardier.setMarca("Bombardier");
         bombardier.setModelo("CRJ");
-        bombardier.setTipoAvion(TipoAvion.COMERCIAL);
+        bombardier.setTipoAvion(TipoAvion.REGIONAL);
         bombardier.setTipoTurbina(TipoTurbina.TURBOFAN);
         avionRepository.save(bombardier);
 
