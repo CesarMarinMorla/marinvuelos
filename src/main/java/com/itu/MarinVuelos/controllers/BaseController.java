@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.io.Serializable;
 
 public interface BaseController<E extends Base, ID extends Serializable> {
-    ResponseEntity<?> getAll();
-    ResponseEntity<?> getAll(Pageable pageable);
-    ResponseEntity<?> getOne(@PathVariable ID id);
-    ResponseEntity<?> save(@RequestBody E entity);
-    ResponseEntity<?> update(@PathVariable ID id, @RequestBody E entity);
-    ResponseEntity<?> delete(@PathVariable ID id);
+    ResponseEntity<?> getAll() throws Exception;
+    ResponseEntity<?> getAll(Pageable pageable) throws Exception;
+    ResponseEntity<?> getOne(@PathVariable ID id) throws Exception;
+    ResponseEntity<?> save(@RequestBody E entity) throws Exception;
+    ResponseEntity<?> update(@PathVariable ID id, @RequestBody E entity) throws Exception;
+    ResponseEntity<?> delete(@PathVariable ID id) throws Exception;
 }
