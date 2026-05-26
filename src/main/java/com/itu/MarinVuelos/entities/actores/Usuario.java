@@ -5,6 +5,9 @@ import com.itu.MarinVuelos.entities.Consulta;
 import com.itu.MarinVuelos.entities.Reserva;
 import com.itu.MarinVuelos.entities.pagos.Tarjeta;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,9 +24,13 @@ import java.util.List;
 @AllArgsConstructor
 public class Usuario extends Persona {
 
+    @NotBlank(message = "Password requerido")
+    @Size(min = 6, message = "Password debe tener al menos 6 caracteres")
     @Column(name = "password")
     private String password;
 
+    @NotBlank(message = "Correo requerido")
+    @Email(message = "Formato de correo inválido")
     @Column(name = "correo")
     private String correo;
 
