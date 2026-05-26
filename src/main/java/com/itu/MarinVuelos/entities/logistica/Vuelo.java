@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "vuelo")
@@ -26,8 +27,17 @@ public class Vuelo extends Base {
     @OneToOne(mappedBy = "vuelo")
     private Avion avion;
 
-    @OneToMany(mappedBy = "vuelo")
-    private ArrayList<Aeropuerto> aeropuertos;
+    /*
+    ManyToMany: un vuelo puede pasar por múltiples aeropuertos,
+    un aeropuerto es usado por múltiples vuelos
+     */
+    @ManyToMany
+    @JoinTable(
+        name = "vuelo_aeropuerto",
+        joinColumns = @JoinColumn(name = "vuelo_id"),
+        inverseJoinColumns = @JoinColumn(name = "aeropuerto_id")
+    )
+    private List<Aeropuerto> aeropuertos = new ArrayList<>();
 
     /*
     Para no duplicar Aerolinea constantemente en la BD
