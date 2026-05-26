@@ -44,12 +44,10 @@ public class Vuelo extends Base {
     @Column(name = "fecha_llegada")
     private LocalDateTime fechaLlegada;
 
-    @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "avion_id")
     private Avion avion;
 
-    @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "piloto_id")
     private Piloto piloto;
