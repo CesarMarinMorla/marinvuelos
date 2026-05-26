@@ -18,8 +18,4 @@ public class Piloto extends Persona {
     @Column(name = "licencia")
     private String licencia;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vuelo_id")
-    private Vuelo vuelo;
-
 }

@@ -51,12 +51,4 @@ public class Vuelo extends Base {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "piloto_id")
     private Piloto piloto;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reserva_id")
-    private Reserva reserva;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "consulta_id")
-    private Consulta consulta;
 }
