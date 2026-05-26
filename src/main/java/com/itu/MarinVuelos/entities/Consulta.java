@@ -19,4 +19,8 @@ public class Consulta extends Base {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vuelo_id")
+    private Vuelo vuelo;
 }
