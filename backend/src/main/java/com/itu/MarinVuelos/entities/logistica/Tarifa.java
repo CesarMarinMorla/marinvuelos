@@ -1,5 +1,6 @@
 package com.itu.MarinVuelos.entities.logistica;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.itu.MarinVuelos.entities.Base;
 import com.itu.MarinVuelos.entities.enums.Clase;
 import jakarta.persistence.*;
@@ -37,5 +38,6 @@ public class Tarifa extends Base {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vuelo_id", nullable = false)
+    @JsonIgnore
     private Vuelo vuelo;
 }

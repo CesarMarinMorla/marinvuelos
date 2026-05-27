@@ -1,7 +1,9 @@
 package com.itu.MarinVuelos.services;
 
 import com.itu.MarinVuelos.entities.Reserva;
+import com.itu.MarinVuelos.entities.logistica.Tarifa;
 import com.itu.MarinVuelos.repositories.ReservaRepository;
+import com.itu.MarinVuelos.repositories.TarifaRepository;
 import com.itu.MarinVuelos.repositories.UsuarioRepository;
 import com.itu.MarinVuelos.repositories.VueloRepository;
 import org.springframework.stereotype.Service;
@@ -11,13 +13,16 @@ public class ReservaServiceImpl extends BaseServiceImpl<Reserva, Long> implement
 
     private final UsuarioRepository usuarioRepository;
     private final VueloRepository vueloRepository;
+    private final TarifaRepository tarifaRepository;
 
     public ReservaServiceImpl(ReservaRepository repository,
                               UsuarioRepository usuarioRepository,
-                              VueloRepository vueloRepository) {
+                              VueloRepository vueloRepository,
+                              TarifaRepository tarifaRepository) {
         super(repository);
         this.usuarioRepository = usuarioRepository;
         this.vueloRepository = vueloRepository;
+        this.tarifaRepository = tarifaRepository;
     }
 
     @Override
@@ -40,5 +45,17 @@ public class ReservaServiceImpl extends BaseServiceImpl<Reserva, Long> implement
         if (reserva.getVuelo() == null || reserva.getVuelo().getId() == null
                 || !vueloRepository.existsById(reserva.getVuelo().getId()))
             throw new IllegalArgumentException("Vuelo no encontrado");
+
+        if (reserva.getTarifa() == null || reserva.getTarifa().getId() == null)
+            throw new IllegalArgumentException("Tarifa requerida");
+
+        Tarifa tarifa = tarifaRepository.findById(reserva.getTarifa().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Tarifa no encontrada"));
+
+        if (tarifa.getVuelo() == null || tarifa.getVuelo().getId() == null
+                || !tarifa.getVuelo().getId().equals(reserva.getVuelo().getId()))
+            throw new IllegalArgumentException("La tarifa no corresponde al vuelo seleccionado");
+
+        reserva.setTarifa(tarifa);
     }
 }

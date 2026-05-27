@@ -1,6 +1,5 @@
 package com.itu.MarinVuelos.entities.logistica;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.itu.MarinVuelos.entities.Base;
 import com.itu.MarinVuelos.entities.Consulta;
 import com.itu.MarinVuelos.entities.Reserva;
@@ -38,7 +37,6 @@ public class Vuelo extends Base {
     @JoinColumn(name = "aerolinea_id", nullable = false)
     private Aerolinea aerolinea;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "vuelo")
     private List<Tarifa> tarifas = new ArrayList<>();
 

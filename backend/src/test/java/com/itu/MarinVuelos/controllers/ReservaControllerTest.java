@@ -2,6 +2,8 @@ package com.itu.MarinVuelos.controllers;
 
 import com.itu.MarinVuelos.entities.Reserva;
 import com.itu.MarinVuelos.entities.actores.Usuario;
+import com.itu.MarinVuelos.entities.enums.Clase;
+import com.itu.MarinVuelos.entities.logistica.Tarifa;
 import com.itu.MarinVuelos.entities.logistica.Vuelo;
 import com.itu.MarinVuelos.services.ReservaServiceImpl;
 import jakarta.persistence.EntityNotFoundException;
@@ -35,8 +37,10 @@ class ReservaControllerTest {
         r.setId(1L);
         Usuario u = new Usuario(); u.setId(1L);
         Vuelo v = new Vuelo(); v.setId(1L);
+        Tarifa t = new Tarifa(); t.setId(1L); t.setClaseTarifa(Clase.ECONOMY);
         r.setUsuario(u);
         r.setVuelo(v);
+        r.setTarifa(t);
         return r;
     }
 
@@ -70,6 +74,16 @@ class ReservaControllerTest {
     void save_missingUsuario_returns400() throws Exception {
         Reserva r = reservaValida();
         r.setUsuario(null);
+        mockMvc.perform(post("/api/v1/reservas")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(r)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void save_missingTarifa_returns400() throws Exception {
+        Reserva r = reservaValida();
+        r.setTarifa(null);
         mockMvc.perform(post("/api/v1/reservas")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(r)))

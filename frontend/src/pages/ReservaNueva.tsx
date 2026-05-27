@@ -24,6 +24,14 @@ interface Vuelo {
   fechaLlegada: string;
   aerolinea?: { nombreAerolinea?: string };
   aeropuertos?: Aeropuerto[];
+  tarifas?: Tarifa[];
+}
+
+interface Tarifa {
+  id: number;
+  claseTarifa?: 'BUSINESS' | 'TURISTA' | 'ECONOMY';
+  precioTarifa?: number;
+  impuestoTarifa?: number;
 }
 
 interface Reserva {
@@ -37,6 +45,7 @@ type FormState = {
   ciudadOrigenId: string;
   ciudadDestinoId: string;
   vueloId: string;
+  tarifaId: string;
 };
 
 type FormErrors = Partial<Record<keyof FormState, string>> & { form?: string };
@@ -46,6 +55,7 @@ const formInicial: FormState = {
   ciudadOrigenId: '',
   ciudadDestinoId: '',
   vueloId: '',
+  tarifaId: '',
 };
 
 export default function ReservaNueva() {
@@ -101,6 +111,8 @@ export default function ReservaNueva() {
   }, [form.ciudadOrigenId, form.ciudadDestinoId, vuelos]);
 
   const vueloSeleccionado = vuelosFiltrados.find((v) => String(v.id) === form.vueloId);
+  const tarifasVuelo = vueloSeleccionado?.tarifas ?? [];
+  const tarifaSeleccionada = tarifasVuelo.find((t) => String(t.id) === form.tarifaId);
 
   const validate = (current: FormState): FormErrors => {
     const nextErrors: FormErrors = {};
@@ -113,6 +125,8 @@ export default function ReservaNueva() {
     }
     if (!current.vueloId) nextErrors.vueloId = 'Seleccione un vuelo.';
     if (current.vueloId && !vueloSeleccionado) nextErrors.vueloId = 'El vuelo seleccionado no es válido para la ruta.';
+    if (!current.tarifaId) nextErrors.tarifaId = 'Seleccione una tarifa.';
+    if (current.tarifaId && !tarifaSeleccionada) nextErrors.tarifaId = 'La tarifa seleccionada no es válida para el vuelo.';
 
     return nextErrors;
   };
@@ -123,7 +137,8 @@ export default function ReservaNueva() {
     setForm((prev) => ({
       ...prev,
       [name]: value,
-      ...(name === 'ciudadOrigenId' || name === 'ciudadDestinoId' ? { vueloId: '' } : {}),
+      ...(name === 'ciudadOrigenId' || name === 'ciudadDestinoId' ? { vueloId: '', tarifaId: '' } : {}),
+      ...(name === 'vueloId' ? { tarifaId: '' } : {}),
     }));
 
     setErrors((current) => ({ ...current, [name]: undefined, form: undefined }));
@@ -145,6 +160,7 @@ export default function ReservaNueva() {
       await api.post('/reservas', {
         usuario: { id: Number(form.usuarioId) },
         vuelo: { id: Number(form.vueloId) },
+        tarifa: { id: Number(form.tarifaId) },
       });
       setMsg({ ok: true, text: 'Reserva creada exitosamente.' });
       setForm(formInicial);
@@ -228,6 +244,27 @@ export default function ReservaNueva() {
           {errors.vueloId && <small style={{ color: 'red' }}>{errors.vueloId}</small>}
         </div>
 
+        <div>
+          <label>Tarifa</label>
+          <select
+            name="tarifaId"
+            value={form.tarifaId}
+            onChange={handleChange}
+            required
+            disabled={!vueloSeleccionado}
+          >
+            <option value="">
+              {!vueloSeleccionado ? '-- Seleccione un vuelo primero --' : '-- Seleccionar tarifa --'}
+            </option>
+            {tarifasVuelo.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.claseTarifa} — ${t.precioTarifa?.toFixed(2) ?? '-'}
+              </option>
+            ))}
+          </select>
+          {errors.tarifaId && <small style={{ color: 'red' }}>{errors.tarifaId}</small>}
+        </div>
+
         {errors.form && <p style={{ color: 'red' }}>{errors.form}</p>}
 
         <button type="submit" disabled={loading || !vueloSeleccionado}>
@@ -240,6 +277,7 @@ export default function ReservaNueva() {
       {form.ciudadOrigenId && form.ciudadDestinoId && vuelosFiltrados.length === 0 && (
         <p>No hay vuelos para esa combinación de ciudades.</p>
       )}
+      {vueloSeleccionado && tarifasVuelo.length === 0 && <p>El vuelo seleccionado no tiene tarifas precargadas.</p>}
 
       <h3>Reservas registradas</h3>
       {reservas.length === 0 ? (

@@ -1,15 +1,29 @@
 package com.itu.MarinVuelos.config;
 
 import com.itu.MarinVuelos.entities.actores.Piloto;
+import com.itu.MarinVuelos.entities.enums.Clase;
 import com.itu.MarinVuelos.entities.enums.TipoAvion;
 import com.itu.MarinVuelos.entities.enums.TipoTurbina;
-import com.itu.MarinVuelos.entities.logistica.*;
-import com.itu.MarinVuelos.repositories.*;
+import com.itu.MarinVuelos.entities.logistica.Aerolinea;
+import com.itu.MarinVuelos.entities.logistica.Aeropuerto;
+import com.itu.MarinVuelos.entities.logistica.Avion;
+import com.itu.MarinVuelos.entities.logistica.Ciudad;
+import com.itu.MarinVuelos.entities.logistica.Tarifa;
+import com.itu.MarinVuelos.entities.logistica.Vuelo;
+import com.itu.MarinVuelos.repositories.AerolineaRepository;
+import com.itu.MarinVuelos.repositories.AeropuertoRepository;
+import com.itu.MarinVuelos.repositories.AvionRepository;
+import com.itu.MarinVuelos.repositories.CiudadRepository;
+import com.itu.MarinVuelos.repositories.PilotoRepository;
+import com.itu.MarinVuelos.repositories.TarifaRepository;
+import com.itu.MarinVuelos.repositories.VueloRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,19 +38,22 @@ public class DataLoader implements CommandLineRunner {
     private final AvionRepository avionRepository;
     private final PilotoRepository pilotoRepository;
     private final VueloRepository vueloRepository;
+    private final TarifaRepository tarifaRepository;
 
     public DataLoader(CiudadRepository ciudadRepository,
                       AeropuertoRepository aeropuertoRepository,
                       AerolineaRepository aerolineaRepository,
                       AvionRepository avionRepository,
                       PilotoRepository pilotoRepository,
-                      VueloRepository vueloRepository) {
+                      VueloRepository vueloRepository,
+                      TarifaRepository tarifaRepository) {
         this.ciudadRepository = ciudadRepository;
         this.aeropuertoRepository = aeropuertoRepository;
         this.aerolineaRepository = aerolineaRepository;
         this.avionRepository = avionRepository;
         this.pilotoRepository = pilotoRepository;
         this.vueloRepository = vueloRepository;
+        this.tarifaRepository = tarifaRepository;
     }
 
     @Override
@@ -53,6 +70,12 @@ public class DataLoader implements CommandLineRunner {
                 loadVuelos();
             } else {
                 log.info("Vuelos ya precargados, saltando vuelos...");
+            }
+
+            if (tarifaRepository.count() == 0) {
+                loadTarifas();
+            } else {
+                log.info("Tarifas ya precargadas, saltando tarifas...");
             }
 
             log.info("=== DataLoader completado exitosamente ===");
@@ -134,6 +157,31 @@ public class DataLoader implements CommandLineRunner {
                 log.info("Vuelos precargados: {}", i + 1);
             }
         }
+    }
+
+    private void loadTarifas() {
+        List<Vuelo> vuelos = new ArrayList<>(vueloRepository.findAll());
+        if (vuelos.isEmpty()) {
+            throw new IllegalStateException("No hay vuelos precargados para crear tarifas.");
+        }
+
+        vuelos.sort((a, b) -> a.getId().compareTo(b.getId()));
+        for (int i = 0; i < vuelos.size(); i++) {
+            Vuelo vuelo = vuelos.get(i);
+            BigDecimal base = BigDecimal.valueOf(120 + (i * 8L));
+            createTarifa(vuelo, Clase.ECONOMY, base, BigDecimal.valueOf(0.18));
+            createTarifa(vuelo, Clase.TURISTA, base.multiply(BigDecimal.valueOf(1.25)), BigDecimal.valueOf(0.18));
+            createTarifa(vuelo, Clase.BUSINESS, base.multiply(BigDecimal.valueOf(1.7)), BigDecimal.valueOf(0.18));
+        }
+    }
+
+    private void createTarifa(Vuelo vuelo, Clase clase, BigDecimal precio, BigDecimal impuestoRate) {
+        Tarifa tarifa = new Tarifa();
+        tarifa.setVuelo(vuelo);
+        tarifa.setClaseTarifa(clase);
+        tarifa.setPrecioTarifa(precio.setScale(2, RoundingMode.HALF_UP));
+        tarifa.setImpuestoTarifa(precio.multiply(impuestoRate).setScale(2, RoundingMode.HALF_UP));
+        tarifaRepository.save(tarifa);
     }
 
     private Ciudad city(String nombre) {
