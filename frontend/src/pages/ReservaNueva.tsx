@@ -38,6 +38,7 @@ interface Reserva {
   id: number;
   usuario?: Usuario;
   vuelo?: Vuelo;
+  tarifa?: Tarifa;
 }
 
 type FormState = {
@@ -113,6 +114,32 @@ export default function ReservaNueva() {
   const vueloSeleccionado = vuelosFiltrados.find((v) => String(v.id) === form.vueloId);
   const tarifasVuelo = vueloSeleccionado?.tarifas ?? [];
   const tarifaSeleccionada = tarifasVuelo.find((t) => String(t.id) === form.tarifaId);
+  const reservasOrdenadas = [...reservas].sort((a, b) => b.id - a.id);
+  const ultimaReserva = reservasOrdenadas[0];
+  const dateFormatter = new Intl.DateTimeFormat('es-AR', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  });
+
+  const formatDate = (value?: string) => {
+    if (!value) return '-';
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? value : dateFormatter.format(date);
+  };
+
+  const formatRuta = (vuelo?: Vuelo) => {
+    const aeropuertosVuelo = vuelo?.aeropuertos ?? [];
+    if (aeropuertosVuelo.length < 2) return '-';
+    const origen = aeropuertosVuelo[0]?.ciudad?.nombreCiudad ?? aeropuertosVuelo[0]?.nombreAeropuerto ?? '-';
+    const destino = aeropuertosVuelo[aeropuertosVuelo.length - 1]?.ciudad?.nombreCiudad ?? aeropuertosVuelo[aeropuertosVuelo.length - 1]?.nombreAeropuerto ?? '-';
+    return `${origen} → ${destino}`;
+  };
+
+  const formatMonto = (tarifa?: Tarifa) => {
+    if (!tarifa) return '-';
+    const total = Number(tarifa.precioTarifa ?? 0) + Number(tarifa.impuestoTarifa ?? 0);
+    return `$${total.toFixed(2)}`;
+  };
 
   const validate = (current: FormState): FormErrors => {
     const nextErrors: FormErrors = {};
@@ -179,7 +206,7 @@ export default function ReservaNueva() {
   return (
     <div className="page-card">
       <h2 className="page-title">Nueva Reserva</h2>
-      <p className="muted">Elegí usuario, ciudades y vuelo disponible para registrar la reserva.</p>
+      <p className="muted">Elegí usuario, ciudades, vuelo y tarifa disponible para registrar la reserva.</p>
 
       <form onSubmit={handleSubmit} noValidate>
         <div>
@@ -272,7 +299,42 @@ export default function ReservaNueva() {
         </button>
       </form>
 
-      {msg && <p style={{ color: msg.ok ? 'green' : 'red' }}>{msg.text}</p>}
+      {msg && (
+        <div
+          style={{
+            marginTop: '1rem',
+            padding: '0.75rem 1rem',
+            borderRadius: 8,
+            background: msg.ok ? '#e8f8ef' : '#fdecec',
+            color: msg.ok ? '#166534' : '#991b1b',
+            border: `1px solid ${msg.ok ? '#86efac' : '#f5c2c7'}`,
+          }}
+        >
+          <strong>{msg.ok ? 'Éxito' : 'Error'}:</strong> {msg.text}
+        </div>
+      )}
+
+      {ultimaReserva && (
+        <section
+          style={{
+            marginTop: '1rem',
+            padding: '1rem',
+            border: '1px solid #d9e2ec',
+            borderRadius: 10,
+            background: '#f8fafc',
+          }}
+        >
+          <h3 style={{ marginTop: 0 }}>Última reserva registrada</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem' }}>
+            <div><strong>Usuario</strong><br />{ultimaReserva.usuario ? `${ultimaReserva.usuario.nombrePersona} ${ultimaReserva.usuario.apellidoPersona}` : '-'}</div>
+            <div><strong>Ruta</strong><br />{formatRuta(ultimaReserva.vuelo)}</div>
+            <div><strong>Vuelo</strong><br />#{ultimaReserva.vuelo?.id ?? '-'}</div>
+            <div><strong>Tarifa</strong><br />{ultimaReserva.tarifa?.claseTarifa ?? '-'}</div>
+            <div><strong>Total</strong><br />{formatMonto(ultimaReserva.tarifa)}</div>
+            <div><strong>Salida</strong><br />{formatDate(ultimaReserva.vuelo?.fechaSalida)}</div>
+          </div>
+        </section>
+      )}
 
       {form.ciudadOrigenId && form.ciudadDestinoId && vuelosFiltrados.length === 0 && (
         <p>No hay vuelos para esa combinación de ciudades.</p>
@@ -288,15 +350,23 @@ export default function ReservaNueva() {
             <tr>
               <th>ID</th>
               <th>Usuario</th>
+              <th>Ruta</th>
               <th>Vuelo</th>
+              <th>Tarifa</th>
+              <th>Total</th>
+              <th>Salida</th>
             </tr>
           </thead>
           <tbody>
-            {reservas.map((r) => (
+            {reservasOrdenadas.map((r) => (
               <tr key={r.id}>
                 <td>{r.id}</td>
                 <td>{r.usuario ? `${r.usuario.nombrePersona} ${r.usuario.apellidoPersona}` : '-'}</td>
-                <td>{r.vuelo ? `#${r.vuelo.id} — ${r.vuelo.fechaSalida}` : '-'}</td>
+                <td>{formatRuta(r.vuelo)}</td>
+                <td>{r.vuelo ? `#${r.vuelo.id}` : '-'}</td>
+                <td>{r.tarifa?.claseTarifa ?? '-'}</td>
+                <td>{formatMonto(r.tarifa)}</td>
+                <td>{formatDate(r.vuelo?.fechaSalida)}</td>
               </tr>
             ))}
           </tbody>
