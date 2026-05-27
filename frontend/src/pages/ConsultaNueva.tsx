@@ -1,13 +1,26 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api/client';
 
-interface Usuario { id: number; nombre: string; apellido: string }
-interface Vuelo { id: number; fechaSalida: string; fechaLlegada: string }
+interface Usuario {
+  id: number;
+  nombrePersona: string;
+  apellidoPersona: string;
+}
+
+interface Vuelo {
+  id: number;
+  fechaSalida: string;
+  fechaLlegada: string;
+  aerolinea?: { nombreAerolinea?: string };
+}
+
 interface Consulta {
   id: number;
-  usuario?: { nombre?: string; apellido?: string };
-  vuelo?: { id?: number; fechaSalida?: string };
+  usuario?: Usuario;
+  vuelo?: Vuelo;
 }
+
+const formInicial = { usuarioId: '', vueloId: '' };
 
 export default function ConsultaNueva() {
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
@@ -15,20 +28,25 @@ export default function ConsultaNueva() {
   const [consultas, setConsultas] = useState<Consulta[]>([]);
   const [loadingCatalogs, setLoadingCatalogs] = useState(true);
   const [catalogError, setCatalogError] = useState<string | null>(null);
-  const [form, setForm] = useState({ usuarioId: '', vueloId: '' });
+  const [form, setForm] = useState(formInicial);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const fetchConsultas = () =>
-    api.get<Consulta[]>('/consultas').then(setConsultas).catch(() => {});
+  const fetchConsultas = async () => {
+    const data = await api.get<Consulta[]>('/consultas');
+    setConsultas(data);
+  };
 
   useEffect(() => {
     Promise.all([
       api.get<Usuario[]>('/usuarios'),
       api.get<Vuelo[]>('/vuelos'),
-      api.get<Consulta[]>('/consultas'),
+      fetchConsultas(),
     ])
-      .then(([u, v, c]) => { setUsuarios(u); setVuelos(v); setConsultas(c); })
+      .then(([u, v]) => {
+        setUsuarios(u);
+        setVuelos(v);
+      })
       .catch((err: unknown) =>
         setCatalogError(err instanceof Error ? err.message : 'Error al cargar datos')
       )
@@ -48,8 +66,8 @@ export default function ConsultaNueva() {
         vuelo: { id: Number(form.vueloId) },
       });
       setMsg({ ok: true, text: 'Consulta creada exitosamente.' });
-      setForm({ usuarioId: '', vueloId: '' });
-      fetchConsultas();
+      setForm(formInicial);
+      await fetchConsultas();
     } catch (err: unknown) {
       setMsg({ ok: false, text: err instanceof Error ? err.message : 'Error desconocido' });
     } finally {
@@ -69,7 +87,9 @@ export default function ConsultaNueva() {
           <select name="usuarioId" value={form.usuarioId} onChange={handleChange} required>
             <option value="">-- Seleccionar --</option>
             {usuarios.map((u) => (
-              <option key={u.id} value={u.id}>{u.nombre} {u.apellido}</option>
+              <option key={u.id} value={u.id}>
+                {u.nombrePersona} {u.apellidoPersona}
+              </option>
             ))}
           </select>
         </div>
@@ -78,7 +98,9 @@ export default function ConsultaNueva() {
           <select name="vueloId" value={form.vueloId} onChange={handleChange} required>
             <option value="">-- Seleccionar --</option>
             {vuelos.map((v) => (
-              <option key={v.id} value={v.id}>#{v.id} — {v.fechaSalida} → {v.fechaLlegada}</option>
+              <option key={v.id} value={v.id}>
+                #{v.id} — {v.aerolinea?.nombreAerolinea ?? '-'} — {v.fechaSalida}
+              </option>
             ))}
           </select>
         </div>
@@ -86,6 +108,7 @@ export default function ConsultaNueva() {
           {loading ? 'Guardando...' : 'Crear Consulta'}
         </button>
       </form>
+
       {msg && <p style={{ color: msg.ok ? 'green' : 'red' }}>{msg.text}</p>}
 
       <h3>Consultas registradas</h3>
@@ -94,14 +117,18 @@ export default function ConsultaNueva() {
       ) : (
         <table border={1} cellPadding={6}>
           <thead>
-            <tr><th>ID</th><th>Usuario</th><th>Vuelo</th></tr>
+            <tr>
+              <th>ID</th>
+              <th>Usuario</th>
+              <th>Vuelo</th>
+            </tr>
           </thead>
           <tbody>
             {consultas.map((c) => (
               <tr key={c.id}>
                 <td>{c.id}</td>
-                <td>{c.usuario ? `${c.usuario.nombre} ${c.usuario.apellido}` : '-'}</td>
-                <td>{c.vuelo ? `#${c.vuelo.id} (${c.vuelo.fechaSalida})` : '-'}</td>
+                <td>{c.usuario ? `${c.usuario.nombrePersona} ${c.usuario.apellidoPersona}` : '-'}</td>
+                <td>{c.vuelo ? `#${c.vuelo.id} — ${c.vuelo.fechaSalida}` : '-'}</td>
               </tr>
             ))}
           </tbody>
