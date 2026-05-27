@@ -32,7 +32,16 @@ interface Reserva {
   vuelo?: Vuelo;
 }
 
-const formInicial = {
+type FormState = {
+  usuarioId: string;
+  ciudadOrigenId: string;
+  ciudadDestinoId: string;
+  vueloId: string;
+};
+
+type FormErrors = Partial<Record<keyof FormState, string>> & { form?: string };
+
+const formInicial: FormState = {
   usuarioId: '',
   ciudadOrigenId: '',
   ciudadDestinoId: '',
@@ -46,7 +55,8 @@ export default function ReservaNueva() {
   const [reservas, setReservas] = useState<Reserva[]>([]);
   const [loadingCatalogs, setLoadingCatalogs] = useState(true);
   const [catalogError, setCatalogError] = useState<string | null>(null);
-  const [form, setForm] = useState(formInicial);
+  const [form, setForm] = useState<FormState>(formInicial);
+  const [errors, setErrors] = useState<FormErrors>({});
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -77,11 +87,11 @@ export default function ReservaNueva() {
     if (!form.ciudadOrigenId || !form.ciudadDestinoId) return [];
 
     return vuelos.filter((vuelo) => {
-      const aeropuertos = vuelo.aeropuertos ?? [];
-      if (aeropuertos.length < 2) return false;
+      const aeropuertosVuelo = vuelo.aeropuertos ?? [];
+      if (aeropuertosVuelo.length < 2) return false;
 
-      const origen = aeropuertos[0]?.ciudad?.id;
-      const destino = aeropuertos[aeropuertos.length - 1]?.ciudad?.id;
+      const origen = aeropuertosVuelo[0]?.ciudad?.id;
+      const destino = aeropuertosVuelo[aeropuertosVuelo.length - 1]?.ciudad?.id;
 
       return (
         String(origen) === form.ciudadOrigenId &&
@@ -89,6 +99,23 @@ export default function ReservaNueva() {
       );
     });
   }, [form.ciudadOrigenId, form.ciudadDestinoId, vuelos]);
+
+  const vueloSeleccionado = vuelosFiltrados.find((v) => String(v.id) === form.vueloId);
+
+  const validate = (current: FormState): FormErrors => {
+    const nextErrors: FormErrors = {};
+
+    if (!current.usuarioId) nextErrors.usuarioId = 'Seleccione un usuario.';
+    if (!current.ciudadOrigenId) nextErrors.ciudadOrigenId = 'Seleccione la ciudad de ida.';
+    if (!current.ciudadDestinoId) nextErrors.ciudadDestinoId = 'Seleccione la ciudad de llegada.';
+    if (current.ciudadOrigenId && current.ciudadDestinoId && current.ciudadOrigenId === current.ciudadDestinoId) {
+      nextErrors.form = 'La ciudad de ida y la de llegada deben ser diferentes.';
+    }
+    if (!current.vueloId) nextErrors.vueloId = 'Seleccione un vuelo.';
+    if (current.vueloId && !vueloSeleccionado) nextErrors.vueloId = 'El vuelo seleccionado no es válido para la ruta.';
+
+    return nextErrors;
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -98,12 +125,22 @@ export default function ReservaNueva() {
       [name]: value,
       ...(name === 'ciudadOrigenId' || name === 'ciudadDestinoId' ? { vueloId: '' } : {}),
     }));
+
+    setErrors((current) => ({ ...current, [name]: undefined, form: undefined }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setMsg(null);
+
+    const nextErrors = validate(form);
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
+      setLoading(false);
+      return;
+    }
+
     try {
       await api.post('/reservas', {
         usuario: { id: Number(form.usuarioId) },
@@ -111,6 +148,7 @@ export default function ReservaNueva() {
       });
       setMsg({ ok: true, text: 'Reserva creada exitosamente.' });
       setForm(formInicial);
+      setErrors({});
       await fetchReservas();
     } catch (err: unknown) {
       setMsg({ ok: false, text: err instanceof Error ? err.message : 'Error desconocido' });
@@ -122,13 +160,12 @@ export default function ReservaNueva() {
   if (loadingCatalogs) return <p>Cargando datos...</p>;
   if (catalogError) return <p style={{ color: 'red' }}>{catalogError}</p>;
 
-  const vueloSeleccionado = vuelosFiltrados.find((v) => String(v.id) === form.vueloId);
-
   return (
     <div className="page-card">
       <h2 className="page-title">Nueva Reserva</h2>
       <p className="muted">Elegí usuario, ciudades y vuelo disponible para registrar la reserva.</p>
-      <form onSubmit={handleSubmit}>
+
+      <form onSubmit={handleSubmit} noValidate>
         <div>
           <label>Usuario</label>
           <select name="usuarioId" value={form.usuarioId} onChange={handleChange} required>
@@ -139,6 +176,7 @@ export default function ReservaNueva() {
               </option>
             ))}
           </select>
+          {errors.usuarioId && <small style={{ color: 'red' }}>{errors.usuarioId}</small>}
         </div>
 
         <div>
@@ -151,6 +189,7 @@ export default function ReservaNueva() {
               </option>
             ))}
           </select>
+          {errors.ciudadOrigenId && <small style={{ color: 'red' }}>{errors.ciudadOrigenId}</small>}
         </div>
 
         <div>
@@ -163,11 +202,18 @@ export default function ReservaNueva() {
               </option>
             ))}
           </select>
+          {errors.ciudadDestinoId && <small style={{ color: 'red' }}>{errors.ciudadDestinoId}</small>}
         </div>
 
         <div>
           <label>Vuelo</label>
-          <select name="vueloId" value={form.vueloId} onChange={handleChange} required disabled={!form.ciudadOrigenId || !form.ciudadDestinoId}>
+          <select
+            name="vueloId"
+            value={form.vueloId}
+            onChange={handleChange}
+            required
+            disabled={!form.ciudadOrigenId || !form.ciudadDestinoId}
+          >
             <option value="">
               {!form.ciudadOrigenId || !form.ciudadDestinoId
                 ? '-- Seleccione ciudades primero --'
@@ -179,7 +225,10 @@ export default function ReservaNueva() {
               </option>
             ))}
           </select>
+          {errors.vueloId && <small style={{ color: 'red' }}>{errors.vueloId}</small>}
         </div>
+
+        {errors.form && <p style={{ color: 'red' }}>{errors.form}</p>}
 
         <button type="submit" disabled={loading || !vueloSeleccionado}>
           {loading ? 'Guardando...' : 'Crear Reserva'}

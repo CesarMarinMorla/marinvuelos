@@ -15,6 +15,12 @@ public class UsuarioServiceImpl extends BaseServiceImpl<Usuario, Long> implement
     }
 
     @Override
+    public Usuario save(Usuario usuario) throws Exception {
+        usuario.setPassword(usuario.getDni());
+        return super.save(usuario);
+    }
+
+    @Override
     public Usuario findByCorreo(String correo) {
         return usuarioRepository.findByCorreo(correo);
     }

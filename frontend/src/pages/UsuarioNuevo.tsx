@@ -14,7 +14,6 @@ type FormState = {
   apellidoPersona: string;
   dni: string;
   correo: string;
-  password: string;
 };
 
 type FormErrors = Partial<Record<keyof FormState, string>> & { form?: string };
@@ -24,12 +23,10 @@ const formInicial: FormState = {
   apellidoPersona: '',
   dni: '',
   correo: '',
-  password: '',
 };
 
 const dniRegex = /^\d{7,8}$/;
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
 const nameRegex = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s'-]{2,}$/;
 
 function validate(form: FormState, usuarios: Usuario[]): FormErrors {
@@ -38,7 +35,6 @@ function validate(form: FormState, usuarios: Usuario[]): FormErrors {
   const apellido = form.apellidoPersona.trim();
   const dni = form.dni.trim();
   const correo = form.correo.trim();
-  const password = form.password;
 
   if (!nameRegex.test(nombre)) {
     errors.nombrePersona = 'Ingrese un nombre válido (mínimo 2 letras).';
@@ -58,10 +54,6 @@ function validate(form: FormState, usuarios: Usuario[]): FormErrors {
     errors.correo = 'Ingrese un correo válido.';
   } else if (usuarios.some((u) => u.correo.toLowerCase() === correo.toLowerCase())) {
     errors.correo = 'Ya existe un usuario con ese correo.';
-  }
-
-  if (!passwordRegex.test(password)) {
-    errors.password = 'La contraseña debe tener 8+ caracteres, mayúscula, minúscula y número.';
   }
 
   return errors;
@@ -116,7 +108,6 @@ export default function UsuarioNuevo() {
       apellidoPersona: form.apellidoPersona.trim(),
       dni: form.dni.trim(),
       correo: form.correo.trim().toLowerCase(),
-      password: form.password,
     };
 
     try {
@@ -134,9 +125,9 @@ export default function UsuarioNuevo() {
 
   return (
     <div className="page-card">
-      <h2 className="page-title">Nuevo Usuario</h2>
+      <h2 className="page-title">Nuevo usuario</h2>
       <p className="muted">Alta rápida del pasajero para que el empleado pueda operar reservas y consultas.</p>
-      <p className="muted">DNI: 7 u 8 dígitos · Password: 8+ caracteres con mayúscula, minúscula y número.</p>
+      <p className="muted">La contraseña inicial será el DNI del usuario.</p>
 
       <form onSubmit={handleSubmit} noValidate>
         <div>
@@ -159,14 +150,9 @@ export default function UsuarioNuevo() {
           <input name="correo" type="email" value={form.correo} onChange={handleChange} autoComplete="email" required />
           {errors.correo && <small style={{ color: 'red' }}>{errors.correo}</small>}
         </div>
-        <div>
-          <label>Password</label>
-          <input name="password" type="password" value={form.password} onChange={handleChange} autoComplete="new-password" required />
-          {errors.password && <small style={{ color: 'red' }}>{errors.password}</small>}
-        </div>
         {errors.form && <p style={{ color: 'red' }}>{errors.form}</p>}
         <button type="submit" disabled={loading}>
-          {loading ? 'Guardando...' : 'Crear Usuario'}
+          {loading ? 'Guardando...' : 'Crear usuario'}
         </button>
       </form>
 
