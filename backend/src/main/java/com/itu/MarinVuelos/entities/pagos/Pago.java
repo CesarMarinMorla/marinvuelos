@@ -1,7 +1,6 @@
 package com.itu.MarinVuelos.entities.pagos;
 
 import com.itu.MarinVuelos.entities.Base;
-import com.itu.MarinVuelos.entities.Reserva;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -24,8 +23,4 @@ public abstract class Pago extends Base {
     @NotNull
     @Column(name = "cantidad",  precision = 10, scale = 2, nullable = false)
     protected BigDecimal cantidad;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reserva_id", nullable = false)
-    protected Reserva reserva;
 }

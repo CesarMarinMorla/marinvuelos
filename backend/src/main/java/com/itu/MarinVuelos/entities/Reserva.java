@@ -2,7 +2,6 @@ package com.itu.MarinVuelos.entities;
 
 import com.itu.MarinVuelos.entities.actores.Usuario;
 import com.itu.MarinVuelos.entities.logistica.Vuelo;
-import com.itu.MarinVuelos.entities.pagos.Pago;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -27,7 +26,4 @@ public class Reserva extends Base{
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vuelo_id", unique = true)
     private Vuelo vuelo;
-
-    @OneToOne(mappedBy = "reserva")
-    private Pago pago;
 }
