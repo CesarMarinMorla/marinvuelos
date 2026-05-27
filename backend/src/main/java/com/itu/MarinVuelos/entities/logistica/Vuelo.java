@@ -51,12 +51,12 @@ public class Vuelo extends Base {
     private LocalDateTime fechaLlegada;
 
     @NotNull(message = "Avion requerido")
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "avion_id")
     private Avion avion;
 
     @NotNull(message = "Piloto requerido")
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "piloto_id")
     private Piloto piloto;
 }
