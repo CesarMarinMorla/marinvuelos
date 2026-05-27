@@ -9,11 +9,15 @@ interface Usuario {
   correo: string;
 }
 
+type TipoTarjeta = 'CREDITO' | 'DEBITO';
+
 type FormState = {
   nombrePersona: string;
   apellidoPersona: string;
   dni: string;
   correo: string;
+  numeroTarjeta: string;
+  tipoTarjeta: TipoTarjeta;
 };
 
 type FormErrors = Partial<Record<keyof FormState, string>> & { form?: string };
@@ -23,9 +27,12 @@ const formInicial: FormState = {
   apellidoPersona: '',
   dni: '',
   correo: '',
+  numeroTarjeta: '',
+  tipoTarjeta: 'CREDITO',
 };
 
 const dniRegex = /^\d{7,8}$/;
+const tarjetaRegex = /^\d{13,19}$/;
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const nameRegex = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s'-]{2,}$/;
 
@@ -35,6 +42,7 @@ function validate(form: FormState, usuarios: Usuario[]): FormErrors {
   const apellido = form.apellidoPersona.trim();
   const dni = form.dni.trim();
   const correo = form.correo.trim();
+  const numeroTarjeta = form.numeroTarjeta.trim();
 
   if (!nameRegex.test(nombre)) {
     errors.nombrePersona = 'Ingrese un nombre válido (mínimo 2 letras).';
@@ -54,6 +62,10 @@ function validate(form: FormState, usuarios: Usuario[]): FormErrors {
     errors.correo = 'Ingrese un correo válido.';
   } else if (usuarios.some((u) => u.correo.toLowerCase() === correo.toLowerCase())) {
     errors.correo = 'Ya existe un usuario con ese correo.';
+  }
+
+  if (!tarjetaRegex.test(numeroTarjeta)) {
+    errors.numeroTarjeta = 'El número de tarjeta debe tener entre 13 y 19 dígitos numéricos.';
   }
 
   return errors;
@@ -85,9 +97,10 @@ export default function UsuarioNuevo() {
     fetchUsuarios();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    const nextValue = name === 'numeroTarjeta' ? value.replace(/\D/g, '') : value;
+    setForm({ ...form, [name]: nextValue });
     setErrors((current) => ({ ...current, [name]: undefined, form: undefined }));
   };
 
@@ -108,11 +121,18 @@ export default function UsuarioNuevo() {
       apellidoPersona: form.apellidoPersona.trim(),
       dni: form.dni.trim(),
       correo: form.correo.trim().toLowerCase(),
+      tarjetas: [
+        {
+          numeroTarjeta: form.numeroTarjeta.trim(),
+          tipoTarjeta: form.tipoTarjeta,
+          cantidad: 0,
+        },
+      ],
     };
 
     try {
       await api.post('/usuarios', payload);
-      setMsg({ ok: true, text: 'Usuario creado exitosamente.' });
+      setMsg({ ok: true, text: 'Usuario y tarjeta creados exitosamente.' });
       setForm(formInicial);
       setErrors({});
       await fetchUsuarios();
@@ -128,6 +148,7 @@ export default function UsuarioNuevo() {
       <h2 className="page-title">Nuevo usuario</h2>
       <p className="muted">Alta rápida del pasajero para que el empleado pueda operar reservas y consultas.</p>
       <p className="muted">La contraseña inicial será el DNI del usuario.</p>
+      <p className="muted">Al guardar, también se enviará su tarjeta inicial de crédito.</p>
 
       <form onSubmit={handleSubmit} noValidate>
         <div>
@@ -149,6 +170,29 @@ export default function UsuarioNuevo() {
           <label>Correo</label>
           <input name="correo" type="email" value={form.correo} onChange={handleChange} autoComplete="email" required />
           {errors.correo && <small style={{ color: 'red' }}>{errors.correo}</small>}
+        </div>
+        <div>
+          <label>Número de tarjeta</label>
+          <input
+            name="numeroTarjeta"
+            value={form.numeroTarjeta}
+            onChange={handleChange}
+            type="text"
+            inputMode="numeric"
+            pattern="\d*"
+            autoComplete="off"
+            minLength={13}
+            maxLength={19}
+            required
+          />
+          {errors.numeroTarjeta && <small style={{ color: 'red' }}>{errors.numeroTarjeta}</small>}
+        </div>
+        <div>
+          <label>Tipo de tarjeta</label>
+          <select name="tipoTarjeta" value={form.tipoTarjeta} onChange={handleChange}>
+            <option value="CREDITO">Crédito</option>
+            <option value="DEBITO">Débito</option>
+          </select>
         </div>
         {errors.form && <p style={{ color: 'red' }}>{errors.form}</p>}
         <button type="submit" disabled={loading}>
