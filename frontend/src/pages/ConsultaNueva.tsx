@@ -12,6 +12,7 @@ interface Vuelo {
   fechaSalida: string;
   fechaLlegada: string;
   aerolinea?: { nombreAerolinea?: string };
+  aeropuertos?: { nombreAeropuerto?: string; ciudad?: { nombreCiudad?: string } }[];
 }
 
 interface Reserva {
@@ -73,6 +74,29 @@ export default function ConsultaNueva() {
         .map((r) => [r.vuelo!.id, r.vuelo!])
     ).values()
   );
+  const consultasOrdenadas = [...consultas].sort((a, b) => b.id - a.id);
+  const ultimaConsulta = consultasOrdenadas[0];
+  const dateFormatter = new Intl.DateTimeFormat('es-AR', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  });
+
+  const formatDate = (value?: string) => {
+    if (!value) return '-';
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? value : dateFormatter.format(date);
+  };
+
+  const formatRuta = (vuelo?: Vuelo) => {
+    const aeropuertosVuelo = vuelo?.aeropuertos ?? [];
+    if (aeropuertosVuelo.length < 2) return '-';
+    const origen = aeropuertosVuelo[0]?.ciudad?.nombreCiudad ?? aeropuertosVuelo[0]?.nombreAeropuerto ?? '-';
+    const destino =
+      aeropuertosVuelo[aeropuertosVuelo.length - 1]?.ciudad?.nombreCiudad ??
+      aeropuertosVuelo[aeropuertosVuelo.length - 1]?.nombreAeropuerto ??
+      '-';
+    return `${origen} → ${destino}`;
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -150,7 +174,42 @@ export default function ConsultaNueva() {
         </button>
       </form>
 
-      {msg && <p style={{ color: msg.ok ? 'green' : 'red' }}>{msg.text}</p>}
+      {msg && (
+        <div
+          style={{
+            marginTop: '1rem',
+            padding: '0.75rem 1rem',
+            borderRadius: 8,
+            background: msg.ok ? '#e8f8ef' : '#fdecec',
+            color: msg.ok ? '#166534' : '#991b1b',
+            border: `1px solid ${msg.ok ? '#86efac' : '#f5c2c7'}`,
+          }}
+        >
+          <strong>{msg.ok ? 'Éxito' : 'Error'}:</strong> {msg.text}
+        </div>
+      )}
+
+      {ultimaConsulta && (
+        <section
+          style={{
+            marginTop: '1rem',
+            padding: '1rem',
+            border: '1px solid #d9e2ec',
+            borderRadius: 10,
+            background: '#f8fafc',
+          }}
+        >
+          <h3 style={{ marginTop: 0 }}>Última consulta registrada</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem' }}>
+            <div><strong>Usuario</strong><br />{ultimaConsulta.usuario ? `${ultimaConsulta.usuario.nombrePersona} ${ultimaConsulta.usuario.apellidoPersona}` : '-'}</div>
+            <div><strong>Ruta</strong><br />{formatRuta(ultimaConsulta.vuelo)}</div>
+            <div><strong>Vuelo</strong><br />#{ultimaConsulta.vuelo?.id ?? '-'}</div>
+            <div><strong>Aerolínea</strong><br />{ultimaConsulta.vuelo?.aerolinea?.nombreAerolinea ?? '-'}</div>
+            <div><strong>Salida</strong><br />{formatDate(ultimaConsulta.vuelo?.fechaSalida)}</div>
+            <div><strong>Llegada</strong><br />{formatDate(ultimaConsulta.vuelo?.fechaLlegada)}</div>
+          </div>
+        </section>
+      )}
 
       <h3>Consultas registradas</h3>
       {consultas.length === 0 ? (
@@ -161,15 +220,23 @@ export default function ConsultaNueva() {
             <tr>
               <th>ID</th>
               <th>Usuario</th>
+              <th>Ruta</th>
               <th>Vuelo</th>
+              <th>Aerolínea</th>
+              <th>Salida</th>
+              <th>Llegada</th>
             </tr>
           </thead>
           <tbody>
-            {consultas.map((c) => (
+            {consultasOrdenadas.map((c) => (
               <tr key={c.id}>
                 <td>{c.id}</td>
                 <td>{c.usuario ? `${c.usuario.nombrePersona} ${c.usuario.apellidoPersona}` : '-'}</td>
-                <td>{c.vuelo ? `#${c.vuelo.id} — ${c.vuelo.fechaSalida}` : '-'}</td>
+                <td>{formatRuta(c.vuelo)}</td>
+                <td>{c.vuelo ? `#${c.vuelo.id}` : '-'}</td>
+                <td>{c.vuelo?.aerolinea?.nombreAerolinea ?? '-'}</td>
+                <td>{formatDate(c.vuelo?.fechaSalida)}</td>
+                <td>{formatDate(c.vuelo?.fechaLlegada)}</td>
               </tr>
             ))}
           </tbody>
