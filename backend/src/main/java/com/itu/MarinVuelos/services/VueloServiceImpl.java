@@ -8,6 +8,9 @@ import com.itu.MarinVuelos.repositories.PilotoRepository;
 import com.itu.MarinVuelos.repositories.VueloRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.List;
+
 @Service
 public class VueloServiceImpl extends BaseServiceImpl<Vuelo, Long> implements VueloService {
 
@@ -38,6 +41,20 @@ public class VueloServiceImpl extends BaseServiceImpl<Vuelo, Long> implements Vu
     public Vuelo update(Long id, Vuelo vuelo) throws Exception {
         validar(vuelo);
         return super.update(id, vuelo);
+    }
+
+    @Override
+    public List<Vuelo> buscar(LocalDate fechaSalida, Long aerolineaId, Long aeropuertoId, Long pilotoId) throws Exception {
+        return findAll().stream()
+                .filter(vuelo -> fechaSalida == null || vuelo.getFechaSalida() != null
+                        && vuelo.getFechaSalida().toLocalDate().isEqual(fechaSalida))
+                .filter(vuelo -> aerolineaId == null || vuelo.getAerolinea() != null
+                        && aerolineaId.equals(vuelo.getAerolinea().getId()))
+                .filter(vuelo -> pilotoId == null || vuelo.getPiloto() != null
+                        && pilotoId.equals(vuelo.getPiloto().getId()))
+                .filter(vuelo -> aeropuertoId == null || vuelo.getAeropuertos() != null
+                        && vuelo.getAeropuertos().stream().anyMatch(a -> aeropuertoId.equals(a.getId())))
+                .toList();
     }
 
     private void validar(Vuelo vuelo) {
