@@ -98,8 +98,9 @@ export default function VuelosList() {
   if (catalogError) return <p style={{ color: 'red' }}>{catalogError}</p>;
 
   return (
-    <div>
-      <h2>Vuelos disponibles</h2>
+    <div className="page-card">
+      <h2 className="page-title">Vuelos disponibles</h2>
+      <p className="muted">Filtrá por fecha y datos operativos para encontrar el vuelo correcto.</p>
       <form onSubmit={handleSubmit} style={{ marginBottom: 16 }}>
         <div>
           <label>Fecha de salida</label>
@@ -134,8 +135,10 @@ export default function VuelosList() {
             ))}
           </select>
         </div>
-        <button type="submit" disabled={loading}>Buscar</button>{' '}
-        <button type="button" onClick={limpiar} disabled={loading}>Limpiar</button>
+        <div className="action-bar">
+          <button type="submit" disabled={loading}>Buscar</button>
+          <button type="button" onClick={limpiar} disabled={loading} className="secondary-link">Limpiar</button>
+        </div>
       </form>
 
       {loading && <p>Cargando...</p>}

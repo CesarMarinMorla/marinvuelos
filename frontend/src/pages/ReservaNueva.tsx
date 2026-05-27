@@ -125,8 +125,9 @@ export default function ReservaNueva() {
   const vueloSeleccionado = vuelosFiltrados.find((v) => String(v.id) === form.vueloId);
 
   return (
-    <div>
-      <h2>Nueva Reserva</h2>
+    <div className="page-card">
+      <h2 className="page-title">Nueva Reserva</h2>
+      <p className="muted">Elegí usuario, ciudades y vuelo disponible para registrar la reserva.</p>
       <form onSubmit={handleSubmit}>
         <div>
           <label>Usuario</label>

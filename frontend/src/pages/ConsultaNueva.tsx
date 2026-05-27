@@ -79,8 +79,9 @@ export default function ConsultaNueva() {
   if (catalogError) return <p style={{ color: 'red' }}>{catalogError}</p>;
 
   return (
-    <div>
-      <h2>Nueva Consulta</h2>
+    <div className="page-card">
+      <h2 className="page-title">Nueva Consulta</h2>
+      <p className="muted">Registrá consultas sobre usuarios y vuelos existentes.</p>
       <form onSubmit={handleSubmit}>
         <div>
           <label>Usuario</label>

@@ -62,8 +62,9 @@ export default function UsuarioNuevo() {
   };
 
   return (
-    <div>
-      <h2>Nuevo Usuario</h2>
+    <div className="page-card">
+      <h2 className="page-title">Nuevo Usuario</h2>
+      <p className="muted">Alta rápida del pasajero para que el empleado pueda operar reservas y consultas.</p>
 
       <form onSubmit={handleSubmit}>
         <div>

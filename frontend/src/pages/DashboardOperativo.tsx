@@ -88,11 +88,11 @@ export default function DashboardOperativo() {
   if (error) return <p style={{ color: 'red' }}>{error}</p>;
 
   return (
-    <div>
-      <h2>Panel operativo</h2>
-      <p>Vista rápida para el empleado que gestiona usuarios, vuelos, reservas y consultas.</p>
+    <div className="page-card">
+      <h2 className="page-title">Panel operativo</h2>
+      <p className="muted">Vista rápida para el empleado que gestiona usuarios, vuelos, reservas y consultas.</p>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, margin: '16px 0' }}>
+      <div className="metric-grid">
         <Card title="Usuarios" value={usuarios.length} />
         <Card title="Vuelos" value={vuelos.length} />
         <Card title="Vuelos de hoy" value={vuelosHoy.length} />
@@ -100,19 +100,19 @@ export default function DashboardOperativo() {
         <Card title="Consultas" value={consultas.length} />
       </div>
 
-      <section style={{ marginBottom: 24 }}>
+      <section className="section-block">
         <h3>Acciones rápidas</h3>
-        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-          <Link to="/usuarios/nuevo">Nuevo usuario</Link>
-          <Link to="/reservas/nueva">Nueva reserva</Link>
-          <Link to="/consultas">Nueva consulta</Link>
-          <Link to="/vuelos">Buscar vuelos</Link>
+        <div className="action-bar">
+          <Link className="action-link" to="/usuarios/nuevo">Nuevo usuario</Link>
+          <Link className="action-link" to="/reservas/nueva">Nueva reserva</Link>
+          <Link className="action-link secondary-link" to="/consultas">Nueva consulta</Link>
+          <Link className="action-link secondary-link" to="/vuelos">Buscar vuelos</Link>
         </div>
       </section>
 
       <Section title="Vuelos de hoy">
         {vuelosHoy.length === 0 ? (
-          <p>No hay vuelos para hoy. Mostrando próximos vuelos.</p>
+          <p className="muted">No hay vuelos para hoy. Mostrando próximos vuelos.</p>
         ) : (
           <FlightTable vuelos={vuelosHoy} />
         )}
@@ -151,17 +151,17 @@ export default function DashboardOperativo() {
 
 function Card({ title, value }: { title: string; value: number }) {
   return (
-    <div style={{ border: '1px solid #ddd', borderRadius: 8, padding: 12, background: '#fafafa' }}>
-      <div style={{ fontSize: 14, color: '#666' }}>{title}</div>
-      <div style={{ fontSize: 28, fontWeight: 700 }}>{value}</div>
+    <div className="metric-card">
+      <div className="metric-card__label">{title}</div>
+      <div className="metric-card__value">{value}</div>
     </div>
   );
 }
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section style={{ marginBottom: 24 }}>
-      <h3 style={{ marginBottom: 8 }}>{title}</h3>
+    <section className="section-block">
+      <h3>{title}</h3>
       {children}
     </section>
   );
