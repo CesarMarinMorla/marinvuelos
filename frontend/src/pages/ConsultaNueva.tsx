@@ -14,6 +14,12 @@ interface Vuelo {
   aerolinea?: { nombreAerolinea?: string };
 }
 
+interface Reserva {
+  id: number;
+  usuario?: Usuario;
+  vuelo?: Vuelo;
+}
+
 interface Consulta {
   id: number;
   usuario?: Usuario;
@@ -24,7 +30,7 @@ const formInicial = { usuarioId: '', vueloId: '' };
 
 export default function ConsultaNueva() {
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
-  const [vuelos, setVuelos] = useState<Vuelo[]>([]);
+  const [reservas, setReservas] = useState<Reserva[]>([]);
   const [consultas, setConsultas] = useState<Consulta[]>([]);
   const [loadingCatalogs, setLoadingCatalogs] = useState(true);
   const [catalogError, setCatalogError] = useState<string | null>(null);
@@ -37,15 +43,22 @@ export default function ConsultaNueva() {
     setConsultas(data);
   };
 
+  const fetchReservasByUsuario = async (usuarioId: number) => {
+    try {
+      const data = await api.get<Reserva[]>(`/reservas?usuarioId=${usuarioId}`);
+      setReservas(data);
+    } catch {
+      setReservas([]);
+    }
+  };
+
   useEffect(() => {
     Promise.all([
       api.get<Usuario[]>('/usuarios'),
-      api.get<Vuelo[]>('/vuelos'),
       fetchConsultas(),
     ])
-      .then(([u, v]) => {
+      .then(([u]) => {
         setUsuarios(u);
-        setVuelos(v);
       })
       .catch((err: unknown) =>
         setCatalogError(err instanceof Error ? err.message : 'Error al cargar datos')
@@ -53,8 +66,23 @@ export default function ConsultaNueva() {
       .finally(() => setLoadingCatalogs(false));
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const vuelosDelUsuario = Array.from(
+    new Map(
+      reservas
+        .filter((r) => r.vuelo)
+        .map((r) => [r.vuelo!.id, r.vuelo!])
+    ).values()
+  );
+
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    if (name === 'usuarioId' && value) {
+      fetchReservasByUsuario(Number(value));
+      setForm({ usuarioId: value, vueloId: '' });
+    } else {
+      setForm({ ...form, [name]: value });
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,7 +109,7 @@ export default function ConsultaNueva() {
   return (
     <div className="page-card">
       <h2 className="page-title">Nueva Consulta</h2>
-      <p className="muted">Registrá consultas sobre usuarios y vuelos existentes.</p>
+      <p className="muted">Elegí un usuario y revisá los vuelos en los que tiene reservas.</p>
       <form onSubmit={handleSubmit}>
         <div>
           <label>Usuario</label>
@@ -96,16 +124,28 @@ export default function ConsultaNueva() {
         </div>
         <div>
           <label>Vuelo</label>
-          <select name="vueloId" value={form.vueloId} onChange={handleChange} required>
-            <option value="">-- Seleccionar --</option>
-            {vuelos.map((v) => (
+          <select
+            name="vueloId"
+            value={form.vueloId}
+            onChange={handleChange}
+            required
+            disabled={!form.usuarioId || vuelosDelUsuario.length === 0}
+          >
+            <option value="">
+              {!form.usuarioId
+                ? '-- Seleccione usuario primero --'
+                : vuelosDelUsuario.length === 0
+                ? '-- No hay reservas para este usuario --'
+                : '-- Seleccionar vuelo --'}
+            </option>
+            {vuelosDelUsuario.map((v) => (
               <option key={v.id} value={v.id}>
                 #{v.id} — {v.aerolinea?.nombreAerolinea ?? '-'} — {v.fechaSalida}
               </option>
             ))}
           </select>
         </div>
-        <button type="submit" disabled={loading}>
+        <button type="submit" disabled={loading || !form.usuarioId || !form.vueloId}>
           {loading ? 'Guardando...' : 'Crear Consulta'}
         </button>
       </form>
