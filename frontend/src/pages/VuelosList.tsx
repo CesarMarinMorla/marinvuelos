@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { api } from '../api/client';
 
 interface Aerolinea { id: number; nombreAerolinea: string }
@@ -53,7 +53,6 @@ export default function VuelosList() {
   const [loadingCatalogs, setLoadingCatalogs] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [catalogError, setCatalogError] = useState<string | null>(null);
-  const topRef = useRef<HTMLDivElement | null>(null);
 
   const buscar = async (nextPage = page, currentFilters = filtros) => {
     setLoading(true);
@@ -102,10 +101,6 @@ export default function VuelosList() {
     }
   }, [loadingCatalogs]);
 
-  useEffect(() => {
-    topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, [pageData?.number]);
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setFiltros({ ...filtros, [e.target.name]: e.target.value });
 
@@ -125,7 +120,7 @@ export default function VuelosList() {
   if (catalogError) return <p style={{ color: 'red' }}>{catalogError}</p>;
 
   return (
-    <div className="page-card" ref={topRef}>
+    <div className="page-card">
       <h2 className="page-title">Vuelos disponibles</h2>
       <p className="muted">Buscá por ruta, fecha y aerolínea; la tabla muestra solo una página a la vez.</p>
 
