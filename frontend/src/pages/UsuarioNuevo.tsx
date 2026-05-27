@@ -9,13 +9,63 @@ interface Usuario {
   correo: string;
 }
 
-const formInicial = {
+type FormState = {
+  nombrePersona: string;
+  apellidoPersona: string;
+  dni: string;
+  correo: string;
+  password: string;
+};
+
+type FormErrors = Partial<Record<keyof FormState, string>> & { form?: string };
+
+const formInicial: FormState = {
   nombrePersona: '',
   apellidoPersona: '',
   dni: '',
   correo: '',
   password: '',
 };
+
+const dniRegex = /^\d{7,8}$/;
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+const nameRegex = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s'-]{2,}$/;
+
+function validate(form: FormState, usuarios: Usuario[]): FormErrors {
+  const errors: FormErrors = {};
+  const nombre = form.nombrePersona.trim();
+  const apellido = form.apellidoPersona.trim();
+  const dni = form.dni.trim();
+  const correo = form.correo.trim();
+  const password = form.password;
+
+  if (!nameRegex.test(nombre)) {
+    errors.nombrePersona = 'Ingrese un nombre válido (mínimo 2 letras).';
+  }
+
+  if (!nameRegex.test(apellido)) {
+    errors.apellidoPersona = 'Ingrese un apellido válido (mínimo 2 letras).';
+  }
+
+  if (!dniRegex.test(dni)) {
+    errors.dni = 'El DNI debe tener 7 u 8 dígitos numéricos.';
+  } else if (usuarios.some((u) => u.dni === dni)) {
+    errors.dni = 'Ya existe un usuario con ese DNI.';
+  }
+
+  if (!emailRegex.test(correo)) {
+    errors.correo = 'Ingrese un correo válido.';
+  } else if (usuarios.some((u) => u.correo.toLowerCase() === correo.toLowerCase())) {
+    errors.correo = 'Ya existe un usuario con ese correo.';
+  }
+
+  if (!passwordRegex.test(password)) {
+    errors.password = 'La contraseña debe tener 8+ caracteres, mayúscula, minúscula y número.';
+  }
+
+  return errors;
+}
 
 export default function UsuarioNuevo() {
   const [form, setForm] = useState(formInicial);
@@ -24,6 +74,7 @@ export default function UsuarioNuevo() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [errors, setErrors] = useState<FormErrors>({});
 
   const fetchUsuarios = async () => {
     setLoadingList(true);
@@ -42,17 +93,37 @@ export default function UsuarioNuevo() {
     fetchUsuarios();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+    setErrors((current) => ({ ...current, [name]: undefined, form: undefined }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setMsg(null);
+
+    const nextErrors = validate(form, usuarios);
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
+      setLoading(false);
+      return;
+    }
+
+    const payload = {
+      nombrePersona: form.nombrePersona.trim(),
+      apellidoPersona: form.apellidoPersona.trim(),
+      dni: form.dni.trim(),
+      correo: form.correo.trim().toLowerCase(),
+      password: form.password,
+    };
+
     try {
-      await api.post('/usuarios', form);
+      await api.post('/usuarios', payload);
       setMsg({ ok: true, text: 'Usuario creado exitosamente.' });
       setForm(formInicial);
+      setErrors({});
       await fetchUsuarios();
     } catch (err: unknown) {
       setMsg({ ok: false, text: err instanceof Error ? err.message : 'Error desconocido' });
@@ -65,28 +136,35 @@ export default function UsuarioNuevo() {
     <div className="page-card">
       <h2 className="page-title">Nuevo Usuario</h2>
       <p className="muted">Alta rápida del pasajero para que el empleado pueda operar reservas y consultas.</p>
+      <p className="muted">DNI: 7 u 8 dígitos · Password: 8+ caracteres con mayúscula, minúscula y número.</p>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} noValidate>
         <div>
           <label>Nombre</label>
-          <input name="nombrePersona" value={form.nombrePersona} onChange={handleChange} required />
+          <input name="nombrePersona" value={form.nombrePersona} onChange={handleChange} autoComplete="given-name" required />
+          {errors.nombrePersona && <small style={{ color: 'red' }}>{errors.nombrePersona}</small>}
         </div>
         <div>
           <label>Apellido</label>
-          <input name="apellidoPersona" value={form.apellidoPersona} onChange={handleChange} required />
+          <input name="apellidoPersona" value={form.apellidoPersona} onChange={handleChange} autoComplete="family-name" required />
+          {errors.apellidoPersona && <small style={{ color: 'red' }}>{errors.apellidoPersona}</small>}
         </div>
         <div>
           <label>DNI</label>
-          <input name="dni" value={form.dni} onChange={handleChange} required />
+          <input name="dni" value={form.dni} onChange={handleChange} inputMode="numeric" autoComplete="off" required />
+          {errors.dni && <small style={{ color: 'red' }}>{errors.dni}</small>}
         </div>
         <div>
           <label>Correo</label>
-          <input name="correo" type="email" value={form.correo} onChange={handleChange} required />
+          <input name="correo" type="email" value={form.correo} onChange={handleChange} autoComplete="email" required />
+          {errors.correo && <small style={{ color: 'red' }}>{errors.correo}</small>}
         </div>
         <div>
           <label>Password</label>
-          <input name="password" type="password" value={form.password} onChange={handleChange} required />
+          <input name="password" type="password" value={form.password} onChange={handleChange} autoComplete="new-password" required />
+          {errors.password && <small style={{ color: 'red' }}>{errors.password}</small>}
         </div>
+        {errors.form && <p style={{ color: 'red' }}>{errors.form}</p>}
         <button type="submit" disabled={loading}>
           {loading ? 'Guardando...' : 'Crear Usuario'}
         </button>
