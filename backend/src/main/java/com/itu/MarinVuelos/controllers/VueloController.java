@@ -2,6 +2,8 @@ package com.itu.MarinVuelos.controllers;
 
 import com.itu.MarinVuelos.entities.logistica.Vuelo;
 import com.itu.MarinVuelos.services.VueloServiceImpl;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,8 +22,10 @@ public class VueloController extends BaseControllerImpl<Vuelo, VueloServiceImpl>
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaSalida,
             @RequestParam(required = false) Long aerolineaId,
-            @RequestParam(required = false) Long aeropuertoId,
-            @RequestParam(required = false) Long pilotoId) throws Exception {
-        return ResponseEntity.ok(servicio.buscar(fechaSalida, aerolineaId, aeropuertoId, pilotoId));
+            @RequestParam(required = false) Long aeropuertoOrigenId,
+            @RequestParam(required = false) Long aeropuertoDestinoId,
+            Pageable pageable) throws Exception {
+        Page<Vuelo> page = servicio.buscar(fechaSalida, aerolineaId, aeropuertoOrigenId, aeropuertoDestinoId, pageable);
+        return ResponseEntity.ok(page);
     }
 }

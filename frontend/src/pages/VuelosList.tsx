@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { api } from '../api/client';
 
 interface Aerolinea { id: number; nombreAerolinea: string }
@@ -17,6 +17,16 @@ interface Vuelo {
   piloto?: { id?: number; nombrePersona?: string; apellidoPersona?: string };
 }
 
+interface PageResponse<T> {
+  content: T[];
+  number: number;
+  size: number;
+  totalPages: number;
+  totalElements: number;
+  first: boolean;
+  last: boolean;
+}
+
 type Filtros = {
   fechaSalida: string;
   aerolineaId: string;
@@ -31,22 +41,38 @@ const filtrosIniciales: Filtros = {
   aeropuertoDestinoId: '',
 };
 
+const PAGE_SIZE = 10;
+
 export default function VuelosList() {
-  const [vuelos, setVuelos] = useState<Vuelo[]>([]);
+  const [pageData, setPageData] = useState<PageResponse<Vuelo> | null>(null);
   const [aerolineas, setAerolineas] = useState<Aerolinea[]>([]);
   const [aeropuertos, setAeropuertos] = useState<Aeropuerto[]>([]);
   const [filtros, setFiltros] = useState<Filtros>(filtrosIniciales);
+  const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
   const [loadingCatalogs, setLoadingCatalogs] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [catalogError, setCatalogError] = useState<string | null>(null);
 
-  const buscar = async () => {
+  const buscar = async (nextPage = page, currentFilters = filtros) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await api.get<Vuelo[]>('/vuelos/buscar');
-      setVuelos(data);
+      const query = new URLSearchParams();
+      query.set('page', String(nextPage));
+      query.set('size', String(PAGE_SIZE));
+      if (currentFilters.fechaSalida) query.set('fechaSalida', currentFilters.fechaSalida);
+      if (currentFilters.aerolineaId) query.set('aerolineaId', currentFilters.aerolineaId);
+      if (currentFilters.aeropuertoOrigenId) {
+        query.set('aeropuertoOrigenId', currentFilters.aeropuertoOrigenId);
+      }
+      if (currentFilters.aeropuertoDestinoId) {
+        query.set('aeropuertoDestinoId', currentFilters.aeropuertoDestinoId);
+      }
+
+      const data = await api.get<PageResponse<Vuelo>>(`/vuelos/buscar?${query.toString()}`);
+      setPageData(data);
+      setPage(data.number);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Error al cargar vuelos');
     } finally {
@@ -71,36 +97,24 @@ export default function VuelosList() {
 
   useEffect(() => {
     if (!loadingCatalogs) {
-      buscar();
+      void buscar(0, filtrosIniciales);
     }
   }, [loadingCatalogs]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setFiltros({ ...filtros, [e.target.name]: e.target.value });
 
-  const vuelosFiltrados = useMemo(() => {
-    return vuelos.filter((vuelo) => {
-      const aeropuertosVuelo = vuelo.aeropuertos ?? [];
-      const origen = aeropuertosVuelo[0];
-      const destino = aeropuertosVuelo[aeropuertosVuelo.length - 1];
-
-      const coincideFecha =
-        !filtros.fechaSalida || vuelo.fechaSalida.slice(0, 10) === filtros.fechaSalida;
-      const coincideAerolinea =
-        !filtros.aerolineaId || String(vuelo.aerolinea?.id) === filtros.aerolineaId;
-      const coincideOrigen =
-        !filtros.aeropuertoOrigenId || String(origen?.id) === filtros.aeropuertoOrigenId;
-      const coincideDestino =
-        !filtros.aeropuertoDestinoId || String(destino?.id) === filtros.aeropuertoDestinoId;
-
-      return coincideFecha && coincideAerolinea && coincideOrigen && coincideDestino;
-    });
-  }, [filtros, vuelos]);
+  const aplicarFiltros = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await buscar(0, filtros);
+  };
 
   const limpiar = async () => {
     setFiltros(filtrosIniciales);
-    await buscar();
+    await buscar(0, filtrosIniciales);
   };
+
+  const pageContent = pageData?.content ?? [];
 
   if (loadingCatalogs) return <p>Cargando catálogos...</p>;
   if (catalogError) return <p style={{ color: 'red' }}>{catalogError}</p>;
@@ -108,9 +122,9 @@ export default function VuelosList() {
   return (
     <div className="page-card">
       <h2 className="page-title">Vuelos disponibles</h2>
-      <p className="muted">Buscá por ruta, fecha y aerolínea sin exponer IDs al empleado.</p>
+      <p className="muted">Buscá por ruta, fecha y aerolínea; la tabla muestra solo una página a la vez.</p>
 
-      <form onSubmit={(e) => e.preventDefault()} style={{ marginBottom: 16 }}>
+      <form onSubmit={aplicarFiltros} style={{ marginBottom: 16 }}>
         <div className="inline-grid">
           <label>Fecha</label>
           <input type="date" name="fechaSalida" value={filtros.fechaSalida} onChange={handleChange} />
@@ -153,7 +167,7 @@ export default function VuelosList() {
         </div>
 
         <div className="action-bar">
-          <button type="button" onClick={() => void buscar()} disabled={loading}>
+          <button type="submit" disabled={loading}>
             Buscar
           </button>
           <button type="button" onClick={() => void limpiar()} disabled={loading} className="secondary-link">
@@ -166,37 +180,51 @@ export default function VuelosList() {
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
       {!loading && !error && (
-        <table border={1} cellPadding={6}>
-          <thead>
-            <tr>
-              <th>Ruta</th>
-              <th>Salida</th>
-              <th>Llegada</th>
-              <th>Aerolínea</th>
-              <th>Piloto</th>
-            </tr>
-          </thead>
-          <tbody>
-            {vuelosFiltrados.map((v) => {
-              const aeropuertosVuelo = v.aeropuertos ?? [];
-              const origen = aeropuertosVuelo[0];
-              const destino = aeropuertosVuelo[aeropuertosVuelo.length - 1];
+        <>
+          <table border={1} cellPadding={6}>
+            <thead>
+              <tr>
+                <th>Ruta</th>
+                <th>Salida</th>
+                <th>Llegada</th>
+                <th>Aerolínea</th>
+                <th>Piloto</th>
+              </tr>
+            </thead>
+            <tbody>
+              {pageContent.map((v) => {
+                const aeropuertosVuelo = v.aeropuertos ?? [];
+                const origen = aeropuertosVuelo[0];
+                const destino = aeropuertosVuelo[aeropuertosVuelo.length - 1];
 
-              return (
-                <tr key={v.id}>
-                  <td>
-                    {origen?.ciudad?.nombreCiudad ?? origen?.nombreAeropuerto ?? '-'} →{' '}
-                    {destino?.ciudad?.nombreCiudad ?? destino?.nombreAeropuerto ?? '-'}
-                  </td>
-                  <td>{v.fechaSalida}</td>
-                  <td>{v.fechaLlegada}</td>
-                  <td>{v.aerolinea?.nombreAerolinea ?? '-'}</td>
-                  <td>{v.piloto ? `${v.piloto.nombrePersona} ${v.piloto.apellidoPersona}` : '-'}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                return (
+                  <tr key={v.id}>
+                    <td>
+                      {origen?.ciudad?.nombreCiudad ?? origen?.nombreAeropuerto ?? '-'} →{' '}
+                      {destino?.ciudad?.nombreCiudad ?? destino?.nombreAeropuerto ?? '-'}
+                    </td>
+                    <td>{v.fechaSalida}</td>
+                    <td>{v.fechaLlegada}</td>
+                    <td>{v.aerolinea?.nombreAerolinea ?? '-'}</td>
+                    <td>{v.piloto ? `${v.piloto.nombrePersona} ${v.piloto.apellidoPersona}` : '-'}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+
+          <div className="action-bar" style={{ marginTop: 12 }}>
+            <button type="button" onClick={() => void buscar(page - 1, filtros)} disabled={loading || !pageData || pageData.first}>
+              Anterior
+            </button>
+            <button type="button" onClick={() => void buscar(page + 1, filtros)} disabled={loading || !pageData || pageData.last}>
+              Siguiente
+            </button>
+            <span className="muted" style={{ alignSelf: 'center' }}>
+              Página {pageData ? pageData.number + 1 : 1} de {pageData?.totalPages ?? 1} · {pageData?.totalElements ?? 0} resultados
+            </span>
+          </div>
+        </>
       )}
     </div>
   );

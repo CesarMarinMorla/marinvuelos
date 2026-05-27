@@ -1,14 +1,19 @@
 package com.itu.MarinVuelos.services;
 
 import com.itu.MarinVuelos.entities.logistica.Vuelo;
+import com.itu.MarinVuelos.entities.logistica.Aeropuerto;
 import com.itu.MarinVuelos.repositories.AerolineaRepository;
 import com.itu.MarinVuelos.repositories.AvionRepository;
 import com.itu.MarinVuelos.repositories.AeropuertoRepository;
 import com.itu.MarinVuelos.repositories.PilotoRepository;
 import com.itu.MarinVuelos.repositories.VueloRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -44,17 +49,33 @@ public class VueloServiceImpl extends BaseServiceImpl<Vuelo, Long> implements Vu
     }
 
     @Override
-    public List<Vuelo> buscar(LocalDate fechaSalida, Long aerolineaId, Long aeropuertoId, Long pilotoId) throws Exception {
-        return findAll().stream()
+    public Page<Vuelo> buscar(LocalDate fechaSalida, Long aerolineaId, Long aeropuertoOrigenId, Long aeropuertoDestinoId, Pageable pageable) throws Exception {
+        List<Vuelo> filtrados = findAll().stream()
                 .filter(vuelo -> fechaSalida == null || vuelo.getFechaSalida() != null
                         && vuelo.getFechaSalida().toLocalDate().isEqual(fechaSalida))
                 .filter(vuelo -> aerolineaId == null || vuelo.getAerolinea() != null
                         && aerolineaId.equals(vuelo.getAerolinea().getId()))
-                .filter(vuelo -> pilotoId == null || vuelo.getPiloto() != null
-                        && pilotoId.equals(vuelo.getPiloto().getId()))
-                .filter(vuelo -> aeropuertoId == null || vuelo.getAeropuertos() != null
-                        && vuelo.getAeropuertos().stream().anyMatch(a -> aeropuertoId.equals(a.getId())))
+                .filter(vuelo -> {
+                    if (aeropuertoOrigenId == null && aeropuertoDestinoId == null) {
+                        return true;
+                    }
+                    List<Aeropuerto> aeropuertos = vuelo.getAeropuertos();
+                    if (aeropuertos == null || aeropuertos.isEmpty()) {
+                        return false;
+                    }
+                    var origen = vuelo.getAeropuertos().get(0);
+                    var destino = vuelo.getAeropuertos().get(vuelo.getAeropuertos().size() - 1);
+                    boolean coincideOrigen = aeropuertoOrigenId == null || origen != null && aeropuertoOrigenId.equals(origen.getId());
+                    boolean coincideDestino = aeropuertoDestinoId == null || destino != null && aeropuertoDestinoId.equals(destino.getId());
+                    return coincideOrigen && coincideDestino;
+                })
+                .sorted(Comparator.comparing(Vuelo::getFechaSalida, Comparator.nullsLast(Comparator.naturalOrder())))
                 .toList();
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), filtrados.size());
+        List<Vuelo> contenido = start >= filtrados.size() ? List.of() : filtrados.subList(start, end);
+        return new PageImpl<>(contenido, pageable, filtrados.size());
     }
 
     private void validar(Vuelo vuelo) {
