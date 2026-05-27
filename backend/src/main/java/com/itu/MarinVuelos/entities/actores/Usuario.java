@@ -24,8 +24,6 @@ import java.util.List;
 @AllArgsConstructor
 public class Usuario extends Persona {
 
-    @NotBlank(message = "Password requerido")
-    @Size(min = 6, message = "Password debe tener al menos 6 caracteres")
     @Column(name = "password")
     private String password;
 
