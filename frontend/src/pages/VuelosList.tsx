@@ -1,55 +1,51 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { api } from '../api/client';
 
 interface Aerolinea { id: number; nombreAerolinea: string }
-interface Aeropuerto { id: number; nombreAeropuerto: string }
-interface Piloto { id: number; nombrePersona?: string; apellidoPersona?: string }
+interface Ciudad { id: number; nombreCiudad: string }
+interface Aeropuerto {
+  id: number;
+  nombreAeropuerto: string;
+  ciudad?: Ciudad;
+}
 interface Vuelo {
   id: number;
   fechaSalida: string;
   fechaLlegada: string;
   aerolinea?: { id?: number; nombreAerolinea?: string };
-  aeropuertos?: { id?: number; nombreAeropuerto?: string }[];
+  aeropuertos?: Aeropuerto[];
   piloto?: { id?: number; nombrePersona?: string; apellidoPersona?: string };
 }
 
 type Filtros = {
   fechaSalida: string;
   aerolineaId: string;
-  aeropuertoId: string;
-  pilotoId: string;
+  aeropuertoOrigenId: string;
+  aeropuertoDestinoId: string;
 };
 
 const filtrosIniciales: Filtros = {
   fechaSalida: '',
   aerolineaId: '',
-  aeropuertoId: '',
-  pilotoId: '',
+  aeropuertoOrigenId: '',
+  aeropuertoDestinoId: '',
 };
 
 export default function VuelosList() {
   const [vuelos, setVuelos] = useState<Vuelo[]>([]);
   const [aerolineas, setAerolineas] = useState<Aerolinea[]>([]);
   const [aeropuertos, setAeropuertos] = useState<Aeropuerto[]>([]);
-  const [pilotos, setPilotos] = useState<Piloto[]>([]);
   const [filtros, setFiltros] = useState<Filtros>(filtrosIniciales);
   const [loading, setLoading] = useState(false);
   const [loadingCatalogs, setLoadingCatalogs] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [catalogError, setCatalogError] = useState<string | null>(null);
 
-  const buscar = async (params: Filtros = filtrosIniciales) => {
+  const buscar = async () => {
     setLoading(true);
     setError(null);
     try {
-      const query = new URLSearchParams();
-      if (params.fechaSalida) query.set('fechaSalida', params.fechaSalida);
-      if (params.aerolineaId) query.set('aerolineaId', params.aerolineaId);
-      if (params.aeropuertoId) query.set('aeropuertoId', params.aeropuertoId);
-      if (params.pilotoId) query.set('pilotoId', params.pilotoId);
-
-      const path = query.toString() ? `/vuelos/buscar?${query.toString()}` : '/vuelos/buscar';
-      const data = await api.get<Vuelo[]>(path);
+      const data = await api.get<Vuelo[]>('/vuelos/buscar');
       setVuelos(data);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Error al cargar vuelos');
@@ -62,12 +58,10 @@ export default function VuelosList() {
     Promise.all([
       api.get<Aerolinea[]>('/aerolineas'),
       api.get<Aeropuerto[]>('/aeropuertos'),
-      api.get<Piloto[]>('/pilotos'),
     ])
-      .then(([aerolineasData, aeropuertosData, pilotosData]) => {
+      .then(([aerolineasData, aeropuertosData]) => {
         setAerolineas(aerolineasData);
         setAeropuertos(aeropuertosData);
-        setPilotos(pilotosData);
       })
       .catch((err: unknown) =>
         setCatalogError(err instanceof Error ? err.message : 'Error al cargar catálogos')
@@ -84,14 +78,28 @@ export default function VuelosList() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setFiltros({ ...filtros, [e.target.name]: e.target.value });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await buscar(filtros);
-  };
+  const vuelosFiltrados = useMemo(() => {
+    return vuelos.filter((vuelo) => {
+      const aeropuertosVuelo = vuelo.aeropuertos ?? [];
+      const origen = aeropuertosVuelo[0];
+      const destino = aeropuertosVuelo[aeropuertosVuelo.length - 1];
+
+      const coincideFecha =
+        !filtros.fechaSalida || vuelo.fechaSalida.slice(0, 10) === filtros.fechaSalida;
+      const coincideAerolinea =
+        !filtros.aerolineaId || String(vuelo.aerolinea?.id) === filtros.aerolineaId;
+      const coincideOrigen =
+        !filtros.aeropuertoOrigenId || String(origen?.id) === filtros.aeropuertoOrigenId;
+      const coincideDestino =
+        !filtros.aeropuertoDestinoId || String(destino?.id) === filtros.aeropuertoDestinoId;
+
+      return coincideFecha && coincideAerolinea && coincideOrigen && coincideDestino;
+    });
+  }, [filtros, vuelos]);
 
   const limpiar = async () => {
     setFiltros(filtrosIniciales);
-    await buscar(filtrosIniciales);
+    await buscar();
   };
 
   if (loadingCatalogs) return <p>Cargando catálogos...</p>;
@@ -100,44 +108,57 @@ export default function VuelosList() {
   return (
     <div className="page-card">
       <h2 className="page-title">Vuelos disponibles</h2>
-      <p className="muted">Filtrá por fecha y datos operativos para encontrar el vuelo correcto.</p>
-      <form onSubmit={handleSubmit} style={{ marginBottom: 16 }}>
-        <div>
-          <label>Fecha de salida</label>
+      <p className="muted">Buscá por ruta, fecha y aerolínea sin exponer IDs al empleado.</p>
+
+      <form onSubmit={(e) => e.preventDefault()} style={{ marginBottom: 16 }}>
+        <div className="inline-grid">
+          <label>Fecha</label>
           <input type="date" name="fechaSalida" value={filtros.fechaSalida} onChange={handleChange} />
         </div>
-        <div>
+
+        <div className="inline-grid">
           <label>Aerolínea</label>
           <select name="aerolineaId" value={filtros.aerolineaId} onChange={handleChange}>
             <option value="">Todas</option>
             {aerolineas.map((a) => (
-              <option key={a.id} value={a.id}>{a.nombreAerolinea}</option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label>Aeropuerto</label>
-          <select name="aeropuertoId" value={filtros.aeropuertoId} onChange={handleChange}>
-            <option value="">Todos</option>
-            {aeropuertos.map((a) => (
-              <option key={a.id} value={a.id}>{a.nombreAeropuerto}</option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label>Piloto</label>
-          <select name="pilotoId" value={filtros.pilotoId} onChange={handleChange}>
-            <option value="">Todos</option>
-            {pilotos.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.nombrePersona} {p.apellidoPersona}
+              <option key={a.id} value={a.id}>
+                {a.nombreAerolinea}
               </option>
             ))}
           </select>
         </div>
+
+        <div className="inline-grid">
+          <label>Aeropuerto de salida</label>
+          <select name="aeropuertoOrigenId" value={filtros.aeropuertoOrigenId} onChange={handleChange}>
+            <option value="">Todos</option>
+            {aeropuertos.map((a) => (
+              <option key={a.id} value={a.id}>
+                {a.nombreAeropuerto} — {a.ciudad?.nombreCiudad ?? 'Sin ciudad'}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="inline-grid">
+          <label>Aeropuerto de llegada</label>
+          <select name="aeropuertoDestinoId" value={filtros.aeropuertoDestinoId} onChange={handleChange}>
+            <option value="">Todos</option>
+            {aeropuertos.map((a) => (
+              <option key={a.id} value={a.id}>
+                {a.nombreAeropuerto} — {a.ciudad?.nombreCiudad ?? 'Sin ciudad'}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div className="action-bar">
-          <button type="submit" disabled={loading}>Buscar</button>
-          <button type="button" onClick={limpiar} disabled={loading} className="secondary-link">Limpiar</button>
+          <button type="button" onClick={() => void buscar()} disabled={loading}>
+            Buscar
+          </button>
+          <button type="button" onClick={() => void limpiar()} disabled={loading} className="secondary-link">
+            Limpiar
+          </button>
         </div>
       </form>
 
@@ -148,25 +169,32 @@ export default function VuelosList() {
         <table border={1} cellPadding={6}>
           <thead>
             <tr>
-              <th>ID</th>
+              <th>Ruta</th>
               <th>Salida</th>
               <th>Llegada</th>
               <th>Aerolínea</th>
-              <th>Aeropuerto(s)</th>
               <th>Piloto</th>
             </tr>
           </thead>
           <tbody>
-            {vuelos.map((v) => (
-              <tr key={v.id}>
-                <td>{v.id}</td>
-                <td>{v.fechaSalida}</td>
-                <td>{v.fechaLlegada}</td>
-                <td>{v.aerolinea?.nombreAerolinea ?? '-'}</td>
-                <td>{v.aeropuertos?.map((a) => a.nombreAeropuerto).join(', ') ?? '-'}</td>
-                <td>{v.piloto ? `${v.piloto.nombrePersona} ${v.piloto.apellidoPersona}` : '-'}</td>
-              </tr>
-            ))}
+            {vuelosFiltrados.map((v) => {
+              const aeropuertosVuelo = v.aeropuertos ?? [];
+              const origen = aeropuertosVuelo[0];
+              const destino = aeropuertosVuelo[aeropuertosVuelo.length - 1];
+
+              return (
+                <tr key={v.id}>
+                  <td>
+                    {origen?.ciudad?.nombreCiudad ?? origen?.nombreAeropuerto ?? '-'} →{' '}
+                    {destino?.ciudad?.nombreCiudad ?? destino?.nombreAeropuerto ?? '-'}
+                  </td>
+                  <td>{v.fechaSalida}</td>
+                  <td>{v.fechaLlegada}</td>
+                  <td>{v.aerolinea?.nombreAerolinea ?? '-'}</td>
+                  <td>{v.piloto ? `${v.piloto.nombrePersona} ${v.piloto.apellidoPersona}` : '-'}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       )}
