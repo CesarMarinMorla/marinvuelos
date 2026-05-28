@@ -14,6 +14,7 @@
   --grv-orange: #ff8c42;
   --grv-border: #dbe3ed;
   --grv-on-primary: #ffffff;
+  --grv-text-route: #00bcd4;
 }
 
 :root:has(body.theme-gruvbox),
@@ -39,7 +40,7 @@
   --grv-text-name:    #ebdbb2;
   --grv-text-label:   #bdae93;
   --grv-text-value:   #fabd2f;
-  --grv-text-route:   #8ec07c;
+  --grv-text-route:   #83a598;
   --grv-text-success: #b8bb26;
   --grv-text-error:   #fb4934;
   --grv-text-warn:    #fabd2f;

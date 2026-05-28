@@ -200,14 +200,14 @@ export default function VuelosList() {
 
                 return (
                   <tr key={v.id}>
-                    <td>
+                    <td className="text-route">
                       {origen?.ciudad?.nombreCiudad ?? origen?.nombreAeropuerto ?? '-'} →{' '}
                       {destino?.ciudad?.nombreCiudad ?? destino?.nombreAeropuerto ?? '-'}
                     </td>
-                    <td>{formatDate(v.fechaSalida)}</td>
-                    <td>{formatDate(v.fechaLlegada)}</td>
+                    <td className="text-date">{formatDate(v.fechaSalida)}</td>
+                    <td className="text-date">{formatDate(v.fechaLlegada)}</td>
                     <td>{v.aerolinea?.nombreAerolinea ?? '-'}</td>
-                    <td>{v.piloto ? `${v.piloto.nombrePersona} ${v.piloto.apellidoPersona}` : '-'}</td>
+                    <td className="text-name">{v.piloto ? `${v.piloto.nombrePersona} ${v.piloto.apellidoPersona}` : '-'}</td>
                   </tr>
                 );
               })}

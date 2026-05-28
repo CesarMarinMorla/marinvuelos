@@ -364,13 +364,13 @@ export default function ReservaNueva() {
           <tbody>
             {reservasOrdenadas.map((r) => (
               <tr key={r.id}>
-                <td>{r.id}</td>
-                <td>{r.usuario ? `${r.usuario.nombrePersona} ${r.usuario.apellidoPersona}` : '-'}</td>
-                <td>{formatRuta(r.vuelo)}</td>
-                <td>{r.vuelo ? `#${r.vuelo.id}` : '-'}</td>
-                <td>{r.tarifa?.claseTarifa ?? '-'}</td>
-                <td>{formatMonto(r.tarifa)}</td>
-                <td>{formatDate(r.vuelo?.fechaSalida)}</td>
+                <td className="text-id">{r.id}</td>
+                <td className="text-name">{r.usuario ? `${r.usuario.nombrePersona} ${r.usuario.apellidoPersona}` : '-'}</td>
+                <td className="text-route">{formatRuta(r.vuelo)}</td>
+                <td className="text-id">{r.vuelo ? `#${r.vuelo.id}` : '-'}</td>
+                <td className="text-label">{r.tarifa?.claseTarifa ?? '-'}</td>
+                <td className="text-value">{formatMonto(r.tarifa)}</td>
+                <td className="text-date">{formatDate(r.vuelo?.fechaSalida)}</td>
               </tr>
             ))}
           </tbody>

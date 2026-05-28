@@ -221,13 +221,13 @@ export default function ConsultaNueva() {
           <tbody>
             {consultasOrdenadas.map((c) => (
               <tr key={c.id}>
-                <td>{c.id}</td>
-                <td>{c.usuario ? `${c.usuario.nombrePersona} ${c.usuario.apellidoPersona}` : '-'}</td>
-                <td>{formatRuta(c.vuelo)}</td>
-                <td>{c.vuelo ? `#${c.vuelo.id}` : '-'}</td>
+                <td className="text-id">{c.id}</td>
+                <td className="text-name">{c.usuario ? `${c.usuario.nombrePersona} ${c.usuario.apellidoPersona}` : '-'}</td>
+                <td className="text-route">{formatRuta(c.vuelo)}</td>
+                <td className="text-id">{c.vuelo ? `#${c.vuelo.id}` : '-'}</td>
                 <td>{c.vuelo?.aerolinea?.nombreAerolinea ?? '-'}</td>
-                <td>{formatDate(c.vuelo?.fechaSalida)}</td>
-                <td>{formatDate(c.vuelo?.fechaLlegada)}</td>
+                <td className="text-date">{formatDate(c.vuelo?.fechaSalida)}</td>
+                <td className="text-date">{formatDate(c.vuelo?.fechaLlegada)}</td>
               </tr>
             ))}
           </tbody>
