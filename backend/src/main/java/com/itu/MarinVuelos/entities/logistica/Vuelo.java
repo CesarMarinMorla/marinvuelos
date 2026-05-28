@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/** Raiz del agregado principal, un vuelo tiene aeropuertos, aerolinea, avion, piloto, tarifas y reservas */
 @Entity
 @Table(name = "vuelo")
 @Getter

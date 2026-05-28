@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.util.ArrayList;
 
+/** Avion asignado a un vuelo, tiene sus propios asientos con clase y disponibilidad */
 @Entity
 @Table(name = "avion")
 @Getter

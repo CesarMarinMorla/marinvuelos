@@ -22,9 +22,7 @@ public class Asiento extends Base {
     @Column(name = "letra")
     private char letra;
 
-    /*
-    Necesario para poder encontrar asientos libres y ocupados
-     */
+    /** necesario para poder encontrar asientos libres y ocupados */
     @Column(name = "ocupado")
     private boolean ocupado;
 

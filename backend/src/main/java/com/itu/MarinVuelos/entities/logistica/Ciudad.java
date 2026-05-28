@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/** Dato maestro referenciado por Aeropuerto para evitar repeticion en la BD */
 @Entity
 @Table(name = "ciudad")
 @Getter

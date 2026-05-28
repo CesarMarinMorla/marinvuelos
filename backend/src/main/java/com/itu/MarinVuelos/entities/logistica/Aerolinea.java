@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.util.ArrayList;
 
+/** dato maestro, existe independiente de los vuelos */
 @Entity
 @Table(name = "aerolinea")
 @Getter
