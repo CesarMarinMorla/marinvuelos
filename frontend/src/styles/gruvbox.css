@@ -1,5 +1,4 @@
 :root {
-  /* Light theme (default) */
   --grv-bg: #f5f7fb;
   --grv-bg-alt: #eef3f8;
   --grv-surface: #ffffff;
@@ -17,45 +16,41 @@
   --grv-on-primary: #ffffff;
 }
 
-/* Gruvbox Dark Hard theme */
 :root:has(body.theme-gruvbox),
 .theme-gruvbox {
   --grv-bg: #1d2021;
   --grv-bg-alt: #282828;
   --grv-surface: #32302f;
   --grv-surface-alt: #3c3836;
-  --grv-fg: #ebdbb2;            /* primary text */
-  --grv-muted: #bdae93;         /* secondary / de-emphasized */
+  --grv-fg: #ebdbb2;
+  --grv-muted: #d5c4a1;
   --grv-red: #fb4934;
   --grv-green: #b8bb26;
   --grv-yellow: #fabd2f;
-  --grv-blue: #458588;
+  --grv-blue: #076678;
   --grv-purple: #d3869b;
   --grv-aqua: #8ec07c;
   --grv-orange: #fe8019;
-  --grv-border: #504945;
+  --grv-border: #665c54;
   --grv-on-primary: #fbf1c7;
 
-  /* Semantic text roles */
-  --grv-text-id:      #d3869b;  /* IDs, codes — pink, stands out without shouting */
-  --grv-text-date:    #83a598;  /* dates/times — teal, calm and distinct */
-  --grv-text-name:    #ebdbb2;  /* person/entity names — full fg weight */
-  --grv-text-label:   #a89984;  /* table headers, field labels — subdued */
-  --grv-text-value:   #fabd2f;  /* metric values, quantities — yellow, draws eye */
-  --grv-text-route:   #8ec07c;  /* routes, airports — aqua/green */
-  --grv-text-success: #b8bb26;  /* positive feedback */
-  --grv-text-error:   #fb4934;  /* errors */
-  --grv-text-warn:    #fabd2f;  /* warnings */
+  --grv-text-id:      #d3869b;
+  --grv-text-date:    #8ec07c;
+  --grv-text-name:    #ebdbb2;
+  --grv-text-label:   #bdae93;
+  --grv-text-value:   #fabd2f;
+  --grv-text-route:   #8ec07c;
+  --grv-text-success: #b8bb26;
+  --grv-text-error:   #fb4934;
+  --grv-text-warn:    #fabd2f;
 }
 
-/* Helper utilities using the tokens */
 .surface        { background: var(--grv-surface);     color: var(--grv-fg); }
 .surface-alt    { background: var(--grv-surface-alt); color: var(--grv-fg); }
 .text-muted     { color: var(--grv-muted); }
 .btn-primary    { background: var(--grv-blue);         color: var(--grv-on-primary); }
 .border         { border: 1px solid var(--grv-border); }
 
-/* Semantic text utilities */
 .text-id        { color: var(--grv-text-id); }
 .text-date      { color: var(--grv-text-date); }
 .text-name      { color: var(--grv-text-name); }

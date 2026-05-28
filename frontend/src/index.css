@@ -251,8 +251,9 @@ tr:last-child td {
 }
 
 .secondary-link {
-  background: var(--grv-surface-alt);
+  background: transparent;
   color: var(--grv-blue);
+  border: 1px solid var(--grv-blue);
 }
 
 .empty-state {
@@ -263,4 +264,44 @@ tr:last-child td {
 .inline-grid {
   display: grid;
   gap: 0.5rem;
+}
+
+.inst-badge {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+.inst-badge__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--grv-muted);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.app-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 0 0 1.5rem;
+  border-top: 1px solid var(--grv-border);
+  background: var(--grv-surface-alt);
+  font-size: 0.78rem;
+  color: var(--grv-muted);
+  height: 66px;
+}
+
+.app-footer__right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  height: 100%;
+}
+
+.app-footer__logo {
+  height: 100%;
+  width: auto;
+  opacity: 0.85;
+  display: block;
 }

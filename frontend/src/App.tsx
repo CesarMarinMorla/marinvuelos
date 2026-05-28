@@ -12,7 +12,7 @@ function Nav() {
         <span className="brand-badge">MV</span>
         <div>
           <h1>MarinVuelos</h1>
-          <p>Panel operativo</p>
+          <p>Sistema de Gestión de Reservas Aéreas</p>
         </div>
       </div>
       <nav className="app-nav">
@@ -32,6 +32,9 @@ function Nav() {
           Consultas
         </NavLink>
       </nav>
+      <div className="inst-badge">
+        <span className="inst-badge__label">ITU - UNCuyo</span>
+      </div>
     </header>
   );
 }
@@ -51,6 +54,13 @@ export default function App() {
           <Route path="*" element={<p className="empty-state">Selecciona una opción del menú.</p>} />
         </Routes>
       </main>
+      <footer className="app-footer">
+        <span>MarinVuelos · Sistema de Gestión de Reservas Aéreas</span>
+        <div className="app-footer__right">
+          <span>César Marín · Programación Orientada a Objetos · ITU - UNCuyo</span>
+          <img src="/logo-itu.jpg" alt="ITU - UNCuyo" className="app-footer__logo" />
+        </div>
+      </footer>
     </BrowserRouter>
   );
 }
