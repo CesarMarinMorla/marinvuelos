@@ -153,7 +153,7 @@ function Card({ title, value }: { title: string; value: number }) {
   return (
     <div className="metric-card">
       <div className="metric-card__label">{title}</div>
-      <div className="metric-card__value">{value}</div>
+      <div className="metric-card__value text-value">{value}</div>
     </div>
   );
 }
@@ -185,12 +185,12 @@ function FlightTable({ vuelos }: { vuelos: Vuelo[] }) {
       <tbody>
         {vuelos.map((v) => (
           <tr key={v.id}>
-            <td>{v.id}</td>
-            <td>{v.fechaSalida}</td>
-            <td>{v.fechaLlegada}</td>
+            <td className="text-id">{v.id}</td>
+            <td className="text-date">{v.fechaSalida}</td>
+            <td className="text-date">{v.fechaLlegada}</td>
             <td>{v.aerolinea?.nombreAerolinea ?? '-'}</td>
-            <td>{v.aeropuertos?.map((a) => a.nombreAeropuerto).join(', ') ?? '-'}</td>
-            <td>{v.piloto ? `${v.piloto.nombrePersona} ${v.piloto.apellidoPersona}` : '-'}</td>
+            <td className="text-route">{v.aeropuertos?.map((a) => a.nombreAeropuerto).join(', ') ?? '-'}</td>
+            <td className="text-name">{v.piloto ? `${v.piloto.nombrePersona} ${v.piloto.apellidoPersona}` : '-'}</td>
           </tr>
         ))}
       </tbody>
