@@ -3,6 +3,8 @@ package com.itu.MarinVuelos.services;
 import com.itu.MarinVuelos.entities.actores.Usuario;
 import com.itu.MarinVuelos.entities.enums.TipoTarjeta;
 import com.itu.MarinVuelos.entities.pagos.Tarjeta;
+import com.itu.MarinVuelos.repositories.ConsultaRepository;
+import com.itu.MarinVuelos.repositories.ReservaRepository;
 import com.itu.MarinVuelos.repositories.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
@@ -13,10 +15,18 @@ import java.util.ArrayList;
 public class UsuarioServiceImpl extends BaseServiceImpl<Usuario, Long> implements UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final ReservaRepository reservaRepository;
+    private final ConsultaRepository consultaRepository;
 
-    public UsuarioServiceImpl(UsuarioRepository usuarioRepository) {
+    public UsuarioServiceImpl(
+            UsuarioRepository usuarioRepository,
+            ReservaRepository reservaRepository,
+            ConsultaRepository consultaRepository
+    ) {
         super(usuarioRepository);
         this.usuarioRepository = usuarioRepository;
+        this.reservaRepository = reservaRepository;
+        this.consultaRepository = consultaRepository;
     }
 
     @Override
@@ -47,6 +57,13 @@ public class UsuarioServiceImpl extends BaseServiceImpl<Usuario, Long> implement
         existing.setCorreo(entity.getCorreo());
         existing.setDni(entity.getDni());
         return baseRepository.save(existing);
+    }
+
+    @Override
+    public boolean delete(Long id) throws Exception {
+        consultaRepository.deleteByUsuarioId(id);
+        reservaRepository.deleteByUsuarioId(id);
+        return super.delete(id);
     }
 
     @Override

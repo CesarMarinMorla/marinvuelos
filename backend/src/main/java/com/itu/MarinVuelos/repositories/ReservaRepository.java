@@ -10,4 +10,5 @@ public interface ReservaRepository extends BaseRepository<Reserva, Long> {
     boolean existsByUsuarioIdAndVueloId(Long usuarioId, Long vueloId);
     boolean existsByUsuarioIdAndVueloIdAndIdNot(Long usuarioId, Long vueloId, Long id);
     List<Reserva> findByUsuarioId(Long usuarioId);
+    long deleteByUsuarioId(Long usuarioId);
 }

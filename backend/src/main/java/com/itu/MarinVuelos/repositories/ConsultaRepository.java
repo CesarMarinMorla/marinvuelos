@@ -5,4 +5,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ConsultaRepository extends BaseRepository<Consulta, Long> {
+    long deleteByUsuarioId(Long usuarioId);
 }
