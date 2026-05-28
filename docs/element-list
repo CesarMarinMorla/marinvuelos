@@ -1,0 +1,10 @@
+com.itu.MarinVuelos
+com.itu.MarinVuelos.config
+com.itu.MarinVuelos.controllers
+com.itu.MarinVuelos.entities
+com.itu.MarinVuelos.entities.actores
+com.itu.MarinVuelos.entities.enums
+com.itu.MarinVuelos.entities.logistica
+com.itu.MarinVuelos.entities.pagos
+com.itu.MarinVuelos.repositories
+com.itu.MarinVuelos.services
