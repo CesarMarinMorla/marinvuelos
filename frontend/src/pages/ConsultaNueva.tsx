@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api/client';
+import { formatDate } from '../utils/date';
 
 interface Usuario {
   id: number;
@@ -76,16 +77,6 @@ export default function ConsultaNueva() {
   );
   const consultasOrdenadas = [...consultas].sort((a, b) => b.id - a.id);
   const ultimaConsulta = consultasOrdenadas[0];
-  const dateFormatter = new Intl.DateTimeFormat('es-AR', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  });
-
-  const formatDate = (value?: string) => {
-    if (!value) return '-';
-    const date = new Date(value);
-    return Number.isNaN(date.getTime()) ? value : dateFormatter.format(date);
-  };
 
   const formatRuta = (vuelo?: Vuelo) => {
     const aeropuertosVuelo = vuelo?.aeropuertos ?? [];
@@ -164,7 +155,7 @@ export default function ConsultaNueva() {
             </option>
             {vuelosDelUsuario.map((v) => (
               <option key={v.id} value={v.id}>
-                #{v.id} — {v.aerolinea?.nombreAerolinea ?? '-'} — {v.fechaSalida}
+                #{v.id} — {v.aerolinea?.nombreAerolinea ?? '-'} — {formatDate(v.fechaSalida)}
               </option>
             ))}
           </select>

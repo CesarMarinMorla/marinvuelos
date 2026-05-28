@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api/client';
+import { formatDate } from '../utils/date';
 
 interface Vuelo {
   id: number;
@@ -186,8 +187,8 @@ function FlightTable({ vuelos }: { vuelos: Vuelo[] }) {
         {vuelos.map((v) => (
           <tr key={v.id}>
             <td className="text-id">{v.id}</td>
-            <td className="text-date">{v.fechaSalida}</td>
-            <td className="text-date">{v.fechaLlegada}</td>
+            <td className="text-date">{formatDate(v.fechaSalida)}</td>
+            <td className="text-date">{formatDate(v.fechaLlegada)}</td>
             <td>{v.aerolinea?.nombreAerolinea ?? '-'}</td>
             <td className="text-route">{v.aeropuertos?.map((a) => a.nombreAeropuerto).join(', ') ?? '-'}</td>
             <td className="text-name">{v.piloto ? `${v.piloto.nombrePersona} ${v.piloto.apellidoPersona}` : '-'}</td>

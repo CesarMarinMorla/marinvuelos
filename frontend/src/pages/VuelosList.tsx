@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api/client';
+import { formatDate } from '../utils/date';
 
 interface Aerolinea { id: number; nombreAerolinea: string }
 interface Ciudad { id: number; nombreCiudad: string }
@@ -203,8 +204,8 @@ export default function VuelosList() {
                       {origen?.ciudad?.nombreCiudad ?? origen?.nombreAeropuerto ?? '-'} →{' '}
                       {destino?.ciudad?.nombreCiudad ?? destino?.nombreAeropuerto ?? '-'}
                     </td>
-                    <td>{v.fechaSalida}</td>
-                    <td>{v.fechaLlegada}</td>
+                    <td>{formatDate(v.fechaSalida)}</td>
+                    <td>{formatDate(v.fechaLlegada)}</td>
                     <td>{v.aerolinea?.nombreAerolinea ?? '-'}</td>
                     <td>{v.piloto ? `${v.piloto.nombrePersona} ${v.piloto.apellidoPersona}` : '-'}</td>
                   </tr>

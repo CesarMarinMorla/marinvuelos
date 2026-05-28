@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '../api/client';
+import { formatDate } from '../utils/date';
 
 interface Usuario {
   id: number;
@@ -116,16 +117,6 @@ export default function ReservaNueva() {
   const tarifaSeleccionada = tarifasVuelo.find((t) => String(t.id) === form.tarifaId);
   const reservasOrdenadas = [...reservas].sort((a, b) => b.id - a.id);
   const ultimaReserva = reservasOrdenadas[0];
-  const dateFormatter = new Intl.DateTimeFormat('es-AR', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  });
-
-  const formatDate = (value?: string) => {
-    if (!value) return '-';
-    const date = new Date(value);
-    return Number.isNaN(date.getTime()) ? value : dateFormatter.format(date);
-  };
 
   const formatRuta = (vuelo?: Vuelo) => {
     const aeropuertosVuelo = vuelo?.aeropuertos ?? [];
@@ -264,7 +255,7 @@ export default function ReservaNueva() {
             </option>
             {vuelosFiltrados.map((v) => (
               <option key={v.id} value={v.id}>
-                #{v.id} — {v.aerolinea?.nombreAerolinea ?? '-'} — {v.fechaSalida}
+                #{v.id} — {v.aerolinea?.nombreAerolinea ?? '-'} — {formatDate(v.fechaSalida)}
               </option>
             ))}
           </select>
