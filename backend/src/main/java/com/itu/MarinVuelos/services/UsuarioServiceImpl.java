@@ -40,6 +40,16 @@ public class UsuarioServiceImpl extends BaseServiceImpl<Usuario, Long> implement
     }
 
     @Override
+    public Usuario update(Long id, Usuario entity) throws Exception {
+        Usuario existing = findById(id);
+        existing.setNombrePersona(entity.getNombrePersona());
+        existing.setApellidoPersona(entity.getApellidoPersona());
+        existing.setCorreo(entity.getCorreo());
+        existing.setDni(entity.getDni());
+        return baseRepository.save(existing);
+    }
+
+    @Override
     public Usuario findByCorreo(String correo) {
         return usuarioRepository.findByCorreo(correo);
     }
