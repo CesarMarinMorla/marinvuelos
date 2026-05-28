@@ -12,7 +12,13 @@ import lombok.Setter;
 
 /** Vincula un usuario con un vuelo y una tarifa, es la raiz de la transaccion de compra */
 @Entity
-@Table(name = "reserva")
+@Table(
+        name = "reserva",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_reserva_usuario_vuelo",
+                columnNames = {"usuario_id", "vuelo_id"}
+        )
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,13 +26,13 @@ import lombok.Setter;
 public class Reserva extends Base{
 
     @NotNull(message = "Usuario requerido")
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usuario_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 
     @NotNull(message = "Vuelo requerido")
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vuelo_id", unique = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vuelo_id", nullable = false)
     private Vuelo vuelo;
 
     @NotNull(message = "Tarifa requerida")

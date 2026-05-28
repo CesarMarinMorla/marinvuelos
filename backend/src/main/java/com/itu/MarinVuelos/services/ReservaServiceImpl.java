@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ReservaServiceImpl extends BaseServiceImpl<Reserva, Long> implements ReservaService {
 
+    private final ReservaRepository reservaRepository;
     private final UsuarioRepository usuarioRepository;
     private final VueloRepository vueloRepository;
     private final TarifaRepository tarifaRepository;
@@ -20,6 +21,7 @@ public class ReservaServiceImpl extends BaseServiceImpl<Reserva, Long> implement
                               VueloRepository vueloRepository,
                               TarifaRepository tarifaRepository) {
         super(repository);
+        this.reservaRepository = repository;
         this.usuarioRepository = usuarioRepository;
         this.vueloRepository = vueloRepository;
         this.tarifaRepository = tarifaRepository;
@@ -27,17 +29,33 @@ public class ReservaServiceImpl extends BaseServiceImpl<Reserva, Long> implement
 
     @Override
     public Reserva save(Reserva reserva) throws Exception {
-        validar(reserva);
+        validarParaAlta(reserva);
         return super.save(reserva);
     }
 
     @Override
     public Reserva update(Long id, Reserva reserva) throws Exception {
-        validar(reserva);
+        validarParaActualizacion(id, reserva);
         return super.update(id, reserva);
     }
 
-    private void validar(Reserva reserva) {
+    private void validarParaAlta(Reserva reserva) {
+        validarDatosBase(reserva);
+        if (reservaRepository.existsByUsuarioIdAndVueloId(
+                reserva.getUsuario().getId(), reserva.getVuelo().getId())) {
+            throw new IllegalArgumentException("El usuario ya tiene una reserva para ese vuelo");
+        }
+    }
+
+    private void validarParaActualizacion(Long id, Reserva reserva) {
+        validarDatosBase(reserva);
+        if (reservaRepository.existsByUsuarioIdAndVueloIdAndIdNot(
+                reserva.getUsuario().getId(), reserva.getVuelo().getId(), id)) {
+            throw new IllegalArgumentException("El usuario ya tiene una reserva para ese vuelo");
+        }
+    }
+
+    private void validarDatosBase(Reserva reserva) {
         if (reserva.getUsuario() == null || reserva.getUsuario().getId() == null
                 || !usuarioRepository.existsById(reserva.getUsuario().getId()))
             throw new IllegalArgumentException("Usuario no encontrado");
