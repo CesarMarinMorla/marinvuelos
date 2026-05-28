@@ -116,7 +116,7 @@ MarinVuelos/
 
 ## Modelo de dominio
 
-El sistema está **centrado en los vuelos**. Las entidades principales son:
+El sistema está **centrado en la administración de vuelos**. Las entidades principales son:
 
 - **Vuelo** — raíz del agregado. Posee tarifas y reservas. Referencia avión, aerolínea, piloto, aeropuerto de origen y destino.
 - **Reserva** — vincula un usuario con un asiento en un vuelo. Posee el pago.
