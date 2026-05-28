@@ -328,7 +328,20 @@ export default function ReservaNueva() {
       )}
 
       {form.ciudadOrigenId && form.ciudadDestinoId && vuelosFiltrados.length === 0 && (
-        <p>No hay vuelos para esa combinación de ciudades.</p>
+        <div
+          style={{
+            marginTop: '1rem',
+            marginBottom: '1rem',
+            padding: '0.75rem 1rem',
+            borderRadius: 8,
+            background: '#fffbeb',
+            color: '#b45309',
+            border: '1px solid #fde68a',
+            fontSize: '0.9rem',
+          }}
+        >
+          ⚠️ <strong>Aviso:</strong> No hay vuelos disponibles para esa combinación de ciudades.
+        </div>
       )}
       {vueloSeleccionado && tarifasVuelo.length === 0 && <p>El vuelo seleccionado no tiene tarifas precargadas.</p>}
 
