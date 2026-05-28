@@ -8,11 +8,10 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 
-/*
-Decisión personal, uso de clase abstracta en vez de clase concreta.
-
-Herencia Joined, crea dos tablas para la superclase y la subclase (mismo PK y FK)
-*/
+/**
+ * Clase abstracta para medios de pago. Decision personal: uso clase abstracta en vez de concreta
+ * Estrategia JOINED, genera tabla propia para {@code pago} y una por subclase, compartiendo el mismo PK
+ */
 @Entity
 @Table(name = "pago")
 @Inheritance(strategy = InheritanceType.JOINED)

@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/** registro de que un usuario consulto un vuelo, sin necesariamente reservarlo */
 @Entity
 @Table(name = "consulta")
 @Getter

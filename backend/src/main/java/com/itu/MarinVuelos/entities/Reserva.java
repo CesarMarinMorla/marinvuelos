@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/** Vincula un usuario con un vuelo y una tarifa, es la raiz de la transaccion de compra */
 @Entity
 @Table(name = "reserva")
 @Getter

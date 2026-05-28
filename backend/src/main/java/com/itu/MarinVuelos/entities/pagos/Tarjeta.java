@@ -27,14 +27,14 @@ public class Tarjeta extends Pago {
     @Column(name = "numero_tarjeta", nullable = false)
     private String numeroTarjeta;
 
+    /** Persiste el nombre del enum en vez del indice, mas legible en la BD */
     @Column(name = "tipo_tarjeta", nullable = false)
-    /* ENUM tipo String, persiste string en vez de indice */
     @Enumerated(EnumType.STRING)
     private TipoTarjeta tipoTarjeta;
 
-    /* LAZY para no cargar al usuario con cada Tarjeta */
+    /** LAZY para no cargar al usuario con cada Tarjeta */
     @ManyToOne(fetch = FetchType.LAZY)
-    /* JoinColumn columna de referencia al usuario */
+    /** JoinColumn columna de referencia al usuario */
     @JoinColumn(name = "usuario_id", nullable = false)
     @JsonIgnore
     private Usuario usuario;
