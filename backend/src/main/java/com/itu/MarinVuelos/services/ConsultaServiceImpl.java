@@ -2,6 +2,7 @@ package com.itu.MarinVuelos.services;
 
 import com.itu.MarinVuelos.entities.Consulta;
 import com.itu.MarinVuelos.repositories.ConsultaRepository;
+import com.itu.MarinVuelos.repositories.ReservaRepository;
 import com.itu.MarinVuelos.repositories.UsuarioRepository;
 import com.itu.MarinVuelos.repositories.VueloRepository;
 import org.springframework.stereotype.Service;
@@ -11,13 +12,16 @@ public class ConsultaServiceImpl extends BaseServiceImpl<Consulta, Long> impleme
 
     private final UsuarioRepository usuarioRepository;
     private final VueloRepository vueloRepository;
+    private final ReservaRepository reservaRepository;
 
     public ConsultaServiceImpl(ConsultaRepository repository,
                                UsuarioRepository usuarioRepository,
-                               VueloRepository vueloRepository) {
+                               VueloRepository vueloRepository,
+                               ReservaRepository reservaRepository) {
         super(repository);
         this.usuarioRepository = usuarioRepository;
         this.vueloRepository = vueloRepository;
+        this.reservaRepository = reservaRepository;
     }
 
     @Override
@@ -40,5 +44,9 @@ public class ConsultaServiceImpl extends BaseServiceImpl<Consulta, Long> impleme
         if (consulta.getVuelo() == null || consulta.getVuelo().getId() == null
                 || !vueloRepository.existsById(consulta.getVuelo().getId()))
             throw new IllegalArgumentException("Vuelo no encontrado");
+
+        if (!reservaRepository.existsByUsuarioIdAndVueloId(
+                consulta.getUsuario().getId(), consulta.getVuelo().getId()))
+            throw new IllegalArgumentException("El usuario no tiene una reserva para el vuelo seleccionado.");
     }
 }
