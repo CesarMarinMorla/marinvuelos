@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
+/** Superclase mapeada con los datos comunes de cualquier persona en el sistema */
 @MappedSuperclass
 @Getter
 @Setter

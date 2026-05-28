@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/** piloto asignado a un vuelo, extiende Persona con su numero de licencia */
 @Entity
 @Table(name = "piloto")
 @Getter
