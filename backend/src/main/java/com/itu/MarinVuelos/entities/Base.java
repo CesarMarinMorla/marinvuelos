@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 
+/** Superclase mapeada, provee el ID autogenerado a todas las entidades */
 @MappedSuperclass
 @Getter
 @Setter
