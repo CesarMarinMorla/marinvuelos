@@ -6,6 +6,12 @@
   font-weight: 400;
 }
 
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -16,6 +22,8 @@ body {
   min-width: 320px;
   min-height: 100vh;
   background: var(--grv-bg);
+  display: flex;
+  flex-direction: column;
 }
 
 a {
@@ -178,8 +186,10 @@ tr:last-child td {
 
 .app-shell {
   max-width: 1360px;
+  width: 100%;
   margin: 0 auto;
   padding: 1.5rem;
+  flex: 1;
 }
 
 .page-card,
