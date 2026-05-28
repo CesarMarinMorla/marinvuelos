@@ -194,9 +194,9 @@ export default function ConsultaNueva() {
           style={{
             marginTop: '1rem',
             padding: '1rem',
-            border: '1px solid #d9e2ec',
+            border: '1px solid var(--grv-border)',
             borderRadius: 10,
-            background: '#f8fafc',
+            background: 'var(--grv-surface-alt)',
           }}
         >
           <h3 style={{ marginTop: 0 }}>Última consulta registrada</h3>
