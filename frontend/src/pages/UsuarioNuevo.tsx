@@ -80,21 +80,34 @@ export default function UsuarioNuevo() {
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [errors, setErrors] = useState<FormErrors>({});
 
-  const fetchUsuarios = async () => {
-    setLoadingList(true);
-    setError(null);
+  const fetchUsuarios = async ({ showLoading = true, clearError = true } = {}) => {
+    if (showLoading) setLoadingList(true);
+    if (clearError) setError(null);
     try {
       const data = await api.get<Usuario[]>('/usuarios');
       setUsuarios(data);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Error al cargar usuarios');
     } finally {
-      setLoadingList(false);
+      if (showLoading) setLoadingList(false);
     }
   };
 
   useEffect(() => {
-    fetchUsuarios();
+    let active = true;
+    (async () => {
+      try {
+        const data = await api.get<Usuario[]>('/usuarios');
+        if (active) setUsuarios(data);
+      } catch (err: unknown) {
+        if (active) setError(err instanceof Error ? err.message : 'Error al cargar usuarios');
+      } finally {
+        if (active) setLoadingList(false);
+      }
+    })();
+    return () => {
+      active = false;
+    };
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -148,32 +161,32 @@ export default function UsuarioNuevo() {
       <h2 className="page-title">Nuevo usuario</h2>
       <p className="muted">Alta rápida del pasajero para que el empleado pueda operar reservas y consultas.</p>
       <p className="muted">La contraseña inicial será el DNI del usuario.</p>
-      <p className="muted">Al guardar, también se enviará su tarjeta inicial de crédito.</p>
 
       <form onSubmit={handleSubmit} noValidate>
         <div>
-          <label>Nombre</label>
-          <input name="nombrePersona" value={form.nombrePersona} onChange={handleChange} autoComplete="given-name" required />
+          <label htmlFor="nombrePersona">Nombre</label>
+          <input id="nombrePersona" name="nombrePersona" value={form.nombrePersona} onChange={handleChange} autoComplete="given-name" required />
           {errors.nombrePersona && <small style={{ color: 'red' }}>{errors.nombrePersona}</small>}
         </div>
         <div>
-          <label>Apellido</label>
-          <input name="apellidoPersona" value={form.apellidoPersona} onChange={handleChange} autoComplete="family-name" required />
+          <label htmlFor="apellidoPersona">Apellido</label>
+          <input id="apellidoPersona" name="apellidoPersona" value={form.apellidoPersona} onChange={handleChange} autoComplete="family-name" required />
           {errors.apellidoPersona && <small style={{ color: 'red' }}>{errors.apellidoPersona}</small>}
         </div>
         <div>
-          <label>DNI</label>
-          <input name="dni" value={form.dni} onChange={handleChange} inputMode="numeric" autoComplete="off" required />
+          <label htmlFor="dni">DNI</label>
+          <input id="dni" name="dni" value={form.dni} onChange={handleChange} inputMode="numeric" autoComplete="off" required />
           {errors.dni && <small style={{ color: 'red' }}>{errors.dni}</small>}
         </div>
         <div>
-          <label>Correo</label>
-          <input name="correo" type="email" value={form.correo} onChange={handleChange} autoComplete="email" required />
+          <label htmlFor="correo">Correo</label>
+          <input id="correo" name="correo" type="email" value={form.correo} onChange={handleChange} autoComplete="email" required />
           {errors.correo && <small style={{ color: 'red' }}>{errors.correo}</small>}
         </div>
         <div>
-          <label>Número de tarjeta</label>
+          <label htmlFor="numeroTarjeta">Número de tarjeta</label>
           <input
+            id="numeroTarjeta"
             name="numeroTarjeta"
             value={form.numeroTarjeta}
             onChange={handleChange}
@@ -188,8 +201,8 @@ export default function UsuarioNuevo() {
           {errors.numeroTarjeta && <small style={{ color: 'red' }}>{errors.numeroTarjeta}</small>}
         </div>
         <div>
-          <label>Tipo de tarjeta</label>
-          <select name="tipoTarjeta" value={form.tipoTarjeta} onChange={handleChange}>
+          <label htmlFor="tipoTarjeta">Tipo de tarjeta</label>
+          <select id="tipoTarjeta" name="tipoTarjeta" value={form.tipoTarjeta} onChange={handleChange}>
             <option value="CREDITO">Crédito</option>
             <option value="DEBITO">Débito</option>
           </select>
