@@ -1,7 +1,7 @@
 :root {
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  color: #10223a;
-  background: #f5f7fb;
+  color: var(--grv-fg);
+  background: var(--grv-bg);
   line-height: 1.5;
   font-weight: 400;
 }
@@ -15,7 +15,7 @@
 body {
   min-width: 320px;
   min-height: 100vh;
-  background: linear-gradient(180deg, #f5f7fb 0%, #eef3f8 100%);
+  background: var(--grv-bg);
 }
 
 a {
@@ -33,8 +33,8 @@ button {
   border: 0;
   border-radius: 10px;
   padding: 0.75rem 1rem;
-  background: #183b66;
-  color: #fff;
+  background: var(--grv-blue);
+  color: var(--grv-on-primary);
   cursor: pointer;
   transition: transform 0.15s ease, opacity 0.15s ease;
 }
@@ -51,10 +51,18 @@ button:disabled {
 input,
 select {
   width: 100%;
-  border: 1px solid #cfd8e3;
+  border: 1px solid var(--grv-border);
   border-radius: 10px;
   padding: 0.7rem 0.85rem;
-  background: #fff;
+  background: var(--grv-surface);
+  color: var(--grv-fg);
+}
+
+input:focus,
+select:focus {
+  outline: 2px solid var(--grv-blue);
+  outline-offset: 1px;
+  border-color: var(--grv-blue);
 }
 
 label {
@@ -62,7 +70,7 @@ label {
   margin-bottom: 0.35rem;
   font-size: 0.92rem;
   font-weight: 600;
-  color: #314861;
+  color: var(--grv-fg);
 }
 
 form {
@@ -78,28 +86,29 @@ form > div {
 
 table {
   width: 100%;
-  border-collapse: collapse;
-  background: #fff;
-  border: 1px solid #dbe3ed;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--grv-surface);
+  border: 1px solid var(--grv-border);
   border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(16, 34, 58, 0.05);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
 th,
 td {
   padding: 0.8rem 0.9rem;
-  border-bottom: 1px solid #e7edf5;
+  border-bottom: 1px solid var(--grv-border);
   text-align: left;
   vertical-align: top;
 }
 
 th {
-  background: #f4f7fb;
+  background: var(--grv-surface-alt);
   font-size: 0.82rem;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  color: #4a617a;
+  color: var(--grv-muted);
 }
 
 tr:last-child td {
@@ -116,9 +125,9 @@ tr:last-child td {
   gap: 1rem;
   align-items: center;
   padding: 1rem 1.5rem;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--grv-surface-alt);
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid #dde6f0;
+  border-bottom: 1px solid var(--grv-border);
 }
 
 .brand {
@@ -134,7 +143,7 @@ tr:last-child td {
 
 .brand p {
   font-size: 0.82rem;
-  color: #66788f;
+  color: var(--grv-muted);
 }
 
 .brand-badge {
@@ -144,8 +153,8 @@ tr:last-child td {
   width: 2.6rem;
   height: 2.6rem;
   border-radius: 14px;
-  background: linear-gradient(135deg, #0f4c81, #2b7bb9);
-  color: #fff;
+  background: linear-gradient(135deg, var(--grv-blue), var(--grv-purple));
+  color: var(--grv-on-primary);
   font-weight: 800;
 }
 
@@ -158,13 +167,13 @@ tr:last-child td {
 .nav-link {
   padding: 0.7rem 0.95rem;
   border-radius: 999px;
-  color: #42566a;
-  background: #edf3f8;
+  color: var(--grv-muted);
+  background: var(--grv-surface-alt);
 }
 
 .nav-link.active {
-  background: #183b66;
-  color: #fff;
+  background: var(--grv-blue);
+  color: var(--grv-on-primary);
 }
 
 .app-shell {
@@ -175,11 +184,11 @@ tr:last-child td {
 
 .page-card,
 .dashboard-card {
-  background: #fff;
-  border: 1px solid #dbe3ed;
+  background: var(--grv-surface);
+  border: 1px solid var(--grv-border);
   border-radius: 18px;
   padding: 1.25rem;
-  box-shadow: 0 8px 24px rgba(16, 34, 58, 0.05);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
 .page-title {
@@ -188,7 +197,7 @@ tr:last-child td {
 }
 
 .muted {
-  color: #66788f;
+  color: var(--grv-muted);
 }
 
 .metric-grid {
@@ -199,10 +208,10 @@ tr:last-child td {
 }
 
 .metric-card {
-  border: 1px solid #dbe3ed;
+  border: 1px solid var(--grv-border);
   border-radius: 16px;
   padding: 1rem;
-  background: linear-gradient(180deg, #fff, #f8fbff);
+  background: var(--grv-surface);
 }
 
 .metric-card__label {
@@ -237,18 +246,18 @@ tr:last-child td {
   justify-content: center;
   padding: 0.7rem 0.95rem;
   border-radius: 12px;
-  background: #183b66;
-  color: #fff;
+  background: var(--grv-blue);
+  color: var(--grv-on-primary);
 }
 
 .secondary-link {
-  background: #edf3f8;
-  color: #183b66;
+  background: var(--grv-surface-alt);
+  color: var(--grv-blue);
 }
 
 .empty-state {
   padding: 1rem;
-  color: #66788f;
+  color: var(--grv-muted);
 }
 
 .inline-grid {
