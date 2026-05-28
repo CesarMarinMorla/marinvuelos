@@ -71,6 +71,35 @@ function validate(form: FormState, usuarios: Usuario[]): FormErrors {
   return errors;
 }
 
+function validateEdit(editForm: { nombrePersona: string; apellidoPersona: string; correo: string; dni: string }, usuarios: Usuario[], currentId: number): string | null {
+  const nombre = editForm.nombrePersona.trim();
+  const apellido = editForm.apellidoPersona.trim();
+  const dni = editForm.dni.trim();
+  const correo = editForm.correo.trim();
+
+  if (!nameRegex.test(nombre)) {
+    return 'Ingrese un nombre válido (mínimo 2 letras).';
+  }
+
+  if (!nameRegex.test(apellido)) {
+    return 'Ingrese un apellido válido (mínimo 2 letras).';
+  }
+
+  if (!dniRegex.test(dni)) {
+    return 'El DNI debe tener 7 u 8 dígitos numéricos.';
+  } else if (usuarios.some((u) => u.dni === dni && u.id !== currentId)) {
+    return 'Ya existe un usuario con ese DNI.';
+  }
+
+  if (!emailRegex.test(correo)) {
+    return 'Ingrese un correo válido.';
+  } else if (usuarios.some((u) => u.correo.toLowerCase() === correo.toLowerCase() && u.id !== currentId)) {
+    return 'Ya existe un usuario con ese correo.';
+  }
+
+  return null;
+}
+
 export default function UsuarioNuevo() {
   const [form, setForm] = useState(formInicial);
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
@@ -79,6 +108,8 @@ export default function UsuarioNuevo() {
   const [error, setError] = useState<string | null>(null);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [errors, setErrors] = useState<FormErrors>({});
+  const [editId, setEditId] = useState<number | null>(null);
+  const [editForm, setEditForm] = useState<Pick<Usuario, 'nombrePersona' | 'apellidoPersona' | 'correo' | 'dni'>>({ nombrePersona: '', apellidoPersona: '', correo: '', dni: '' });
 
   const fetchUsuarios = async ({ showLoading = true, clearError = true } = {}) => {
     if (showLoading) setLoadingList(true);
@@ -156,6 +187,44 @@ export default function UsuarioNuevo() {
     }
   };
 
+  const handleDelete = async (id: number, nombre: string) => {
+    if (!confirm(`¿Eliminar a ${nombre}? Se eliminarán sus tarjetas y reservas.`)) return;
+    try {
+      await api.delete(`/usuarios/${id}`);
+      await fetchUsuarios({ showLoading: false });
+    } catch (err: unknown) {
+      setMsg({ ok: false, text: err instanceof Error ? err.message : 'Error al eliminar' });
+    }
+  };
+
+  const startEdit = (u: Usuario) => {
+    setEditId(u.id);
+    setEditForm({ nombrePersona: u.nombrePersona, apellidoPersona: u.apellidoPersona, correo: u.correo, dni: u.dni });
+  };
+
+  const handleEditSave = async (id: number) => {
+    const trimmedForm = {
+      nombrePersona: editForm.nombrePersona.trim(),
+      apellidoPersona: editForm.apellidoPersona.trim(),
+      correo: editForm.correo.trim().toLowerCase(),
+      dni: editForm.dni.trim(),
+    };
+
+    const errorMsg = validateEdit(trimmedForm, usuarios, id);
+    if (errorMsg) {
+      setMsg({ ok: false, text: errorMsg });
+      return;
+    }
+    setMsg(null);
+    try {
+      await api.put(`/usuarios/${id}`, trimmedForm);
+      setEditId(null);
+      await fetchUsuarios({ showLoading: false });
+    } catch (err: unknown) {
+      setMsg({ ok: false, text: err instanceof Error ? err.message : 'Error al actualizar' });
+    }
+  };
+
   return (
     <div className="page-card">
       <h2 className="page-title">Nuevo usuario</h2>
@@ -230,16 +299,36 @@ export default function UsuarioNuevo() {
               <th>Nombre</th>
               <th>Apellido</th>
               <th>Correo</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
             {usuarios.map((u) => (
               <tr key={u.id}>
-                <td>{u.id}</td>
-                <td>{u.dni}</td>
-                <td>{u.nombrePersona}</td>
-                <td>{u.apellidoPersona}</td>
-                <td>{u.correo}</td>
+                <td className="text-id">{u.id}</td>
+                {editId === u.id ? (
+                  <>
+                    <td><input value={editForm.dni} onChange={e => setEditForm({ ...editForm, dni: e.target.value.replace(/\D/g, '') })} /></td>
+                    <td><input value={editForm.nombrePersona} onChange={e => setEditForm({ ...editForm, nombrePersona: e.target.value })} /></td>
+                    <td><input value={editForm.apellidoPersona} onChange={e => setEditForm({ ...editForm, apellidoPersona: e.target.value })} /></td>
+                    <td><input value={editForm.correo} onChange={e => setEditForm({ ...editForm, correo: e.target.value })} /></td>
+                    <td style={{ display: 'flex', gap: '0.35rem', justifyContent: 'center' }}>
+                      <button type="button" className="btn-table" onClick={() => handleEditSave(u.id)}>Guardar</button>
+                      <button type="button" className="btn-table secondary-link" onClick={() => setEditId(null)}>Cancelar</button>
+                    </td>
+                  </>
+                ) : (
+                  <>
+                    <td>{u.dni}</td>
+                    <td className="text-name">{u.nombrePersona}</td>
+                    <td className="text-name">{u.apellidoPersona}</td>
+                    <td>{u.correo}</td>
+                    <td style={{ display: 'flex', gap: '0.35rem', justifyContent: 'center' }}>
+                      <button type="button" className="btn-table" onClick={() => startEdit(u)}>Editar</button>
+                      <button type="button" className="btn-table" onClick={() => handleDelete(u.id, u.nombrePersona)} style={{ background: 'var(--grv-red)' }}>Eliminar</button>
+                    </td>
+                  </>
+                )}
               </tr>
             ))}
           </tbody>
