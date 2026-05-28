@@ -130,17 +130,17 @@ El sistema está **centrado en la administración de vuelos**. Las entidades pri
 
 Todos los controladores extienden `BaseController<T, ID>` que expone CRUD estándar. Controladores disponibles:
 
-| Recurso       | Ruta base           |
-|---------------|---------------------|
-| Vuelos        | `/api/vuelos`       |
-| Reservas      | `/api/reservas`     |
-| Usuarios      | `/api/usuarios`     |
-| Consultas     | `/api/consultas`    |
-| Aerolíneas    | `/api/aerolineas`   |
-| Aeropuertos   | `/api/aeropuertos`  |
-| Aviones       | `/api/aviones`      |
-| Ciudades      | `/api/ciudades`     |
-| Pilotos       | `/api/pilotos`      |
+| Recurso       | Ruta base              |
+|---------------|------------------------|
+| Vuelos        | `/api/v1/vuelos`       |
+| Reservas      | `/api/v1/reservas`     |
+| Usuarios      | `/api/v1/usuarios`     |
+| Consultas     | `/api/v1/consultas`    |
+| Aerolíneas    | `/api/v1/aerolineas`   |
+| Aeropuertos   | `/api/v1/aeropuertos`  |
+| Aviones       | `/api/v1/aviones`      |
+| Ciudades      | `/api/v1/ciudades`     |
+| Pilotos       | `/api/v1/pilotos`      |
 
 Los errores de validación y excepciones son manejados centralmente por `GlobalExceptionHandler`.
 
